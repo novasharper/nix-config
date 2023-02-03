@@ -26,6 +26,8 @@ with import <nixpkgs> {};
         mosh
         ncdu
         yt-dlp
+        # --- AV ---
+        vlc
         # --- fonts ---
         office-code-pro
       ];
@@ -150,12 +152,21 @@ with import <nixpkgs> {};
     stateVersion = "22.11";
   };
 
-  programs.dircolors = {
-    enable = true;
-  };
+  programs = {
+    dircolors.enable = true;
+    home-manager.enable = true;
 
-  programs.home-manager = {
-    enable = true;
+    mpv = {
+      enable = true;
+    };
+
+    obs-studio = {
+      enable = true;
+    };
+
+    vscode = {
+      enable = true;
+    };
   };
 
   imports = [
