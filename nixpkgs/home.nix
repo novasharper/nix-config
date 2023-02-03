@@ -91,6 +91,7 @@ with import <nixpkgs> {};
           "$HOME/.nix-defexpr/channels"
           "${nixProfDir}/channels"
         ];
+        /*
         PKG_CONFIG_PATH = concatStringsSep ":" [
           "$HOME/.nix-profile/lib/pkgconfig"
           "${nixProfDir}/profile/lib/pkgconfig"
@@ -106,6 +107,7 @@ with import <nixpkgs> {};
           #"/usr/local/lib64"
           #"/usr/local/lib"
         ];
+        */
       };
     shellAliases = {
       e = "\${EDITOR:-emacs -nw}";
