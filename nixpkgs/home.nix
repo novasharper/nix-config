@@ -109,8 +109,8 @@ with import <nixpkgs> {};
       };
     shellAliases = {
       e = "\${EDITOR:-emacs -nw}";
-      "rm~" = "find . -type f -name \*~ -delete";
-      rmTilda = "find . -type f -name \*~ -delete";
+      "rm~" = "find . -type f -name \\*~ -delete";
+      rmTilda = "find . -type f -name \\*~ -delete";
       path = "echo -e \${PATH//:\\\\n}";
       rsync-progress = "rsync -azp --info=progress2";
       ls = "ls --color=auto";
