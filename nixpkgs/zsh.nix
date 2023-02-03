@@ -13,6 +13,9 @@
       theme = "ys";
     };
     initExtra = ''
+    # TODO: Use sessionPath after https://github.com/nix-community/home-manager/issues/3324
+    PATH="$HOME/.local/bin:$HOME/bin:$HOME/go/bin:$HOME/.nix-profile/bin:$PATH"
+    export PATH
     # $1 = type; 0 - both, 1 - tab, 2 - title
     # rest = text
     setTerminalText() {
