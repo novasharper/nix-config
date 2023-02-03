@@ -8,7 +8,6 @@
       lightline-ale
       lightline-vim
       rust-vim
-      vim-colors-solarized
       vim-polyglot
       vim-sensible
     ];
@@ -55,7 +54,6 @@
     syntax enable
     filetype plugin indent on
     set hlsearch
-    colorscheme solarized
     hi Normal guibg=NONE ctermbg=NONE
 
     let g:go_version_warning = 0
