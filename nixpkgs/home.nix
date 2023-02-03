@@ -84,10 +84,26 @@ with import <nixpkgs> {};
     */
     sessionVariables = 
       let nixProfDir = "/nix/var/nix/profiles/per-user/$USER";
-      in {
-        NIX_PATH = "$HOME/.nix-defexpr/channels:${nixProfDir}/channels\${NIX_PATH:+:$NIX_PATH}";
-        PKG_CONFIG_PATH = "$HOME/.nix-profile/lib/pkgconfig:${nixProfDir}/profile/lib/pkgconfig\${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}";
-        LD_LIBRARY_PATH = "$HOME/.nix-profile/lib:${nixProfDir}/profile/lib/pkgconfig\${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}";
+      in with lib.strings; {
+        NIX_PATH = concatStringsSep ":" [
+          "$HOME/.nix-defexpr/channels"
+          "${nixProfDir}/channels"
+        ];
+        PKG_CONFIG_PATH = concatStringsSep ":" [
+          "$HOME/.nix-profile/lib/pkgconfig"
+          "${nixProfDir}/profile/lib/pkgconfig"
+          #"/usr/share/pkgconfig"
+          #"/usr/lib64/pkgconfig"
+          #"/usr/local/lib/pkgconfig"
+        ];
+        LD_LIBRARY_PATH = concatStringsSep ":" [
+          "$HOME/.nix-profile/lib"
+          "${nixProfDir}/profile/lib/pkgconfig"
+          #"/usr/lib64"
+          #"/usr/lib"
+          #"/usr/local/lib64"
+          #"/usr/local/lib"
+        ];
       };
     shellAliases = {
       e = "\${EDITOR:-emacs -nw}";
