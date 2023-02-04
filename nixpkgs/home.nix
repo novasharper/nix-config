@@ -81,7 +81,6 @@ in {
         inkscape
         mypaint
         # --- AV ---
-        (nixGuiWrap mpv)
         (nixGuiWrap obs-studio)
         (nixGuiWrap vlc)
         # --- fonts ---
@@ -247,6 +246,10 @@ in {
           pv = "pr view";
         };
       };
+    };
+
+    mpv = enable {
+      package = nixGuiWrap pkgs.mpv;
     };
 
     vscode = enable {
