@@ -28,6 +28,7 @@ let
       chmod +x $wrapped_bin
     done
   '';
+  enable = x: x // { enable = true; };
 
 in {
   home = {
@@ -212,8 +213,7 @@ in {
 
     bash =
       let shellCommon = import ./shell-common.nix;
-      in {
-        enable = true;
+      in enable {
         bashrcExtra = shellCommon.envExtra;
         initExtra = ''
         if [ -f /etc/bashrc ] ; then
@@ -224,8 +224,7 @@ in {
         '';
       };
 
-    gh = {
-      enable = true;
+    gh = enable {
       settings = {
         git_protocol = "https";
         prompt = "enabled";
@@ -236,23 +235,17 @@ in {
       };
     };
 
-    vscode = {
-      enable = true;
+    vscode = enable {
       extensions = with pkgs.vscode-extensions; [
         bbenoist.nix
       ];
     };
   };
 
-  targets.genericLinux = {
-    enable = true;
-  };
+  targets.genericLinux.enable = true;
 
-  xdg = {
-    enable = true;
-    mime = {
-      enable = true;
-    };
+  xdg = enable {
+    mime.enable = true;
     systemDirs.data = [
       "$HOME/.home-manager-share"
       "$HOME/.local/share"
