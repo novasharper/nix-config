@@ -250,6 +250,11 @@ in {
 
     mpv = enable {
       package = nixGuiWrap pkgs.mpv;
+
+      config = {
+        gpu-context = "x11egl";
+        hwdec = "vaapi-copy";
+      };
     };
 
     vscode = enable {
