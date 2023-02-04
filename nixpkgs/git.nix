@@ -33,6 +33,9 @@
       http = {
         sslVerify = "true";
       };
+      init = {
+        defaultBranch = "main";
+      };
       pull = {
         ff = "only";
       };
