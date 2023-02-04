@@ -207,6 +207,16 @@ in {
     stateVersion = "22.11";
   };
 
+  news.display = "silent";
+
+  nix = {
+    package = pkgs.nix;
+
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+    };
+  };
+
   programs = {
     dircolors.enable = true;
     home-manager.enable = true;
@@ -250,11 +260,6 @@ in {
       "$HOME/.home-manager-share"
       "$HOME/.local/share"
     ];
-    configFile = {
-      "nix/nix.conf".text = ''
-      experimental-features = nix-command flakes
-      '';
-    };
   };
 
   imports = [
