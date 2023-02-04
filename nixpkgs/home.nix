@@ -250,6 +250,11 @@ in {
       "$HOME/.home-manager-share"
       "$HOME/.local/share"
     ];
+    configFile = {
+      "nix/nix.conf".text = ''
+      experimental-features = nix-command flakes
+      '';
+    };
   };
 
   imports = [
