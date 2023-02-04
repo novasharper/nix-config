@@ -13,14 +13,26 @@ let
           preferLocalBuild = true;
           allowSubstitues = false;
         } "cp /proc/modules $out 2> /dev/null || touch $out";
-      data = builtins.readFile _modulesFile;
-      match = builtins.match "video [0-9]+ [0-9]+ ([a-z0-9_]+,)+ .*" data;
+      _driverMatch =
+        builtins.match
+        ".*video [0-9]+ [0-9]+ (([a-z0-9_]+,)+) .*"
+        (builtins.readFile _modulesFile);
       videoDrivers =
-        if match != null
-        then builtins.split "," (builtins.head match)
-        else null;
+        let
+          data =
+            if _driverMatch != null
+            then builtins.split "," (builtins.head _driverMatch)
+            else [];
+        in
+          builtins.trace "[NixGL] Detected Drivers: ${builtins.toString data}" data;
+      intelPresent =
+        let
+          data = builtins.any (drv: drv == "i915") videoDrivers;
+          strv = if data then "true" else "false";
+        in
+          builtins.trace "[NixGL] Intel Present: ${strv}" data;
     in
-      if videoDrivers ? "i915"
+      if intelPresent
       then nixgl.nixGLIntel
       else nixgl.auto.nixGLNvidia;
   nixGuiWrap = pkg: pkgs.runCommand "${pkg.name}-nixgui-wrapper" {
