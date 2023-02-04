@@ -79,7 +79,7 @@ in {
         # --- AV ---
         (nixGuiWrap mpv)
         (nixGuiWrap obs-studio)
-        vlc
+        (nixGuiWrap vlc)
         # --- fonts ---
         office-code-pro
       ];
