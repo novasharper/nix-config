@@ -93,7 +93,7 @@ in {
         if [ -f $_nix_version_file ] ; then
           _nix_version=$(cat $_nix_version_file)
           _nix_channel=nixos-$_nix_version
-          nix-channel --add https://nixos.org/channels/$_nix_channel
+          nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
         fi
 
         nix-channel --update
