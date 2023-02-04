@@ -64,7 +64,6 @@ in {
         # === general ===
         bat
         colordiff
-        gh                   # github cli - https://github.com/cli/cli
         htop
         httpie
         jq
@@ -224,6 +223,18 @@ in {
         ${shellCommon.initExtra}
         '';
       };
+
+    gh = {
+      enable = true;
+      settings = {
+        git_protocol = "https";
+        prompt = "enabled";
+        aliases = {
+          co = "pr checkout";
+          pv = "pr view";
+        };
+      };
+    };
 
     vscode = {
       enable = true;
