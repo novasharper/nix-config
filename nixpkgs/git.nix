@@ -76,6 +76,9 @@
       ".pytest_cache"
       "flycheck_*.py"
     ];
+    includes = [
+      { path = "~/.config/git/gpg.config"; }
+    ];
     lfs = {
       enable = true;
     };
