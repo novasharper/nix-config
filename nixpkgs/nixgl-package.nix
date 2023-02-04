@@ -32,5 +32,5 @@ let
 
 in
   if intelPresent
-  then nixgl.nixGLIntel
-  else nixgl.auto.nixGLNvidia
+  then nixgl.nixGLCommon nixgl.nixGLIntel
+  else nixgl.nixGLCommon nixgl.auto.nixGLNvidia
