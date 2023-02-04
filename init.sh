@@ -15,6 +15,7 @@ NIXPKGS_VERSION=$(cat $CURRENT_DIR/nixpkgs/VERSION)
 NIXPKGS_CHANNEL=nixos-$NIXPKGS_VERSION
 echo "Configuring nix to use the $NIXPKGS_VERSION channel"
 nix-channel --add https://nixos.org/channels/$NIXPKGS_CHANNEL nixpkgs
+nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
 nix-channel --update
 
 if [[ ! -d ~/.config ]] ; then
