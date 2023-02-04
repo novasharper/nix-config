@@ -3,7 +3,26 @@
 with import <nixpkgs> {};
 let
   nixgl = import <nixgl> {};
-  nixGLPackage = nixgl.nixGLIntel;
+  # i915           = intel driver
+  # nvidia_modeset = nvidia driver
+  nixGLPackage =
+    let
+      _modulesFile =
+        runCommand "impure-loaded-modules-file" {
+          time = builtins.currentTime;
+          preferLocalBuild = true;
+          allowSubstitues = false;
+        } "cp /proc/modules $out 2> /dev/null || touch $out";
+      data = builtins.readFile _modulesFile;
+      match = builtins.match "video [0-9]+ [0-9]+ ([a-z0-9_]+,)+ .*" data;
+      videoDrivers =
+        if match != null
+        then builtins.split "," (builtins.head match)
+        else null;
+    in
+      if videoDrivers ? "i915"
+      then nixgl.nixGLIntel
+      else nixgl.auto.nixGLNvidia;
   nixGuiWrap = pkg: pkgs.runCommand "${pkg.name}-nixgui-wrapper" {
     preferLocalBuild = true;
   } ''
