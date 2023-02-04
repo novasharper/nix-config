@@ -192,6 +192,20 @@ in {
     dircolors.enable = true;
     home-manager.enable = true;
 
+    bash =
+      let shellCommon = import ./shell-common.nix;
+      in {
+        enable = true;
+        bashrcExtra = shellCommon.envExtra;
+        initExtra = ''
+        if [ -f /etc/bashrc ] ; then
+          . /etc/bashrc
+        fi
+
+        ${shellCommon.initExtra}
+        '';
+      };
+
     vscode = {
       enable = true;
       extensions = with pkgs.vscode-extensions; [
