@@ -81,6 +81,7 @@ in {
         inkscape
         mypaint
         # --- AV ---
+        (nixGuiWrap celluloid)
         (nixGuiWrap obs-studio)
         (nixGuiWrap vlc)
         # --- fonts ---
