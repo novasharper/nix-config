@@ -72,6 +72,10 @@ in {
         mosh
         ncdu
         yt-dlp
+        # --- Art ---
+        gimp
+        inkscape
+        mypaint
         # --- AV ---
         (nixGuiWrap mpv)
         (nixGuiWrap obs-studio)
