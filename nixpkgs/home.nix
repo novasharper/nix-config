@@ -84,6 +84,7 @@ in {
         kubernetes-helm
         mosh
         ncdu
+        tmux
         yt-dlp
         # --- Art ---
         gimp
