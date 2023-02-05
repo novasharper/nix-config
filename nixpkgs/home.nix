@@ -175,6 +175,7 @@ in {
           #"/usr/local/lib"
         ];
         */
+        EDITOR = "${lib.getExe pkgs.vim}";
       };
     shellAliases = {
       e = "\${EDITOR:-emacs -nw}";
