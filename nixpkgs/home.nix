@@ -58,12 +58,21 @@ in {
         nixGLPackage
 
         # === languages ===
+        # --- build ---
+        meson
+        ninja
+        # --- c++ ---
+        clang-tools
         # --- go ---
         golangci-lint
         gopls
+        gotools
         # --- rust-lang ---
         cargo
+        cargo-binutils
+        cargo-edit
         rustc
+        rustfmt
         rust-analyzer
 
         # === general ===
@@ -248,6 +257,9 @@ in {
         };
       };
     };
+
+
+    go.enable = true;
 
     mpv = enable {
       package = nixGuiWrap pkgs.mpv;
