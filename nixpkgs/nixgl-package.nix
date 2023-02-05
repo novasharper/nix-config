@@ -30,7 +30,10 @@ let
     in
       builtins.trace "[NixGL] Intel Present: ${strv}" data;
 
-in
-  if intelPresent
-  then nixgl.nixGLCommon nixgl.nixGLIntel
-  else nixgl.nixGLCommon nixgl.auto.nixGLNvidia
+in {
+  inherit intelPresent;
+  package =
+    if intelPresent
+    then nixgl.nixGLCommon nixgl.nixGLIntel
+    else nixgl.nixGLCommon nixgl.auto.nixGLNvidia;
+}
