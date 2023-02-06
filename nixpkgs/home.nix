@@ -235,19 +235,6 @@ in {
     dircolors.enable = true;
     home-manager.enable = true;
 
-    bash =
-      let shellCommon = import ./shell-common.nix;
-      in enable {
-        bashrcExtra = shellCommon.envExtra;
-        initExtra = ''
-        if [ -f /etc/bashrc ] ; then
-          . /etc/bashrc
-        fi
-
-        ${shellCommon.initExtra}
-        '';
-      };
-
     gh = enable {
       settings = {
         git_protocol = "https";
@@ -293,7 +280,7 @@ in {
 
   imports = [
     ./git.nix
+    ./shells.nix
     ./vim.nix
-    ./zsh.nix
   ];
 }
