@@ -261,6 +261,33 @@ in {
       );
     };
 
+    tmux = enable {
+      plugins = with pkgs.tmuxPlugins; [
+        pain-control
+        prefix-highlight
+      ];
+      shell = "${pkgs.zsh}/bin/zsh";
+      shortcut = "a";
+      terminal = "screen-256color";
+      extraConfig = ''
+      # Left Status
+      set -g status-left '[ #h:#S ] '
+      set -g status-left-length 30
+
+      # Right Status
+      set -g status-right ' #{prefix_highlight} %A %m/%d | %H:%M '
+      set -g status-right-length 60
+
+      # Window title options
+      set-window-option -g window-status-style bright
+      set-window-option -g window-status-current-style bright
+
+      # Active window title colors
+      set -g window-status-format ' #I:#W#F '
+      set -g window-status-current-format '#[bg=white,fg=black] #I:#W#F '
+      '';
+    };
+
     vscode = enable {
       extensions = with pkgs.vscode-extensions; [
         bbenoist.nix
