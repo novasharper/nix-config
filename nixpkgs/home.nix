@@ -35,6 +35,9 @@ in {
         golangci-lint
         gopls
         gotools
+        # --- nix ---
+        nixpkgs-fmt
+        nixpkgs-lint
         # --- rust-lang ---
         cargo
         cargo-binutils
