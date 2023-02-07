@@ -64,10 +64,9 @@ let
     (builtins.readFile _modulesFile);
   videoModules =
     let
-      data =
-        if _moduleMatch != null
-        then builtins.split "," (builtins.head _moduleMatch)
-        else [];
+      data = lib.optionals
+        (_moduleMatch != null)
+        (builtins.split "," (builtins.head _moduleMatch));
     in
       builtins.trace "[NixGL] Detected Modules: ${builtins.toString data}" data;
   # i915           = intel module
