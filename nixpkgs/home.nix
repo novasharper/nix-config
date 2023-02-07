@@ -250,9 +250,23 @@ in {
     go.enable = true;
 
     mpv = enable {
-      package = nixGuiWrap pkgs.mpv;
+      package =
+        let
+          inhibit-gnome = import ./contrib/inhibit-gnome.nix {
+            inherit lib stdenv fetchFromGitHub;
+            inherit (pkgs) pkg-config dbus mpv-unwrapped;
+          };
+        in
+          nixGuiWrap (
+            pkgs.wrapMpv pkgs.mpv-unwrapped {
+              scripts = [ inhibit-gnome ];
+            }
+          );
 
       config = {
+        script-opts = with lib.strings; concatStringsSep "," [
+          "ytdl_hook-ytdl_path=${lib.getExe pkgs.yt-dlp}"
+        ];
         gpu-context = "x11egl";
       } // (
         if nixgl.intelPresent
