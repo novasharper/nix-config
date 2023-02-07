@@ -4,7 +4,8 @@ let
   enable = x: x // { enable = true; };
   shellCommon = import ./shell-common.nix;
 
-in {
+in
+{
   programs = {
     zsh = enable {
       enableCompletion = true;
@@ -23,11 +24,11 @@ in {
     bash = enable {
       bashrcExtra = shellCommon.envExtra;
       initExtra = ''
-      if [ -f /etc/bashrc ] ; then
-        . /etc/bashrc
-      fi
+        if [ -f /etc/bashrc ] ; then
+          . /etc/bashrc
+        fi
 
-      ${shellCommon.initExtra}
+        ${shellCommon.initExtra}
       '';
     };
   };

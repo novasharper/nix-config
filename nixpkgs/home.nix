@@ -1,11 +1,12 @@
 { config, pkgs, lib, ... }:
 
-with import <nixpkgs> {};
+with import <nixpkgs> { };
 let
   nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
   enable = x: x // { enable = true; };
 
-in {
+in
+{
   home = {
     username = "pllong";
     homeDirectory = "/home/pllong";
@@ -15,7 +16,7 @@ in {
           "writeBoundary"
           "createXdgUserDirectories"
         ];
-        before = [];
+        before = [ ];
         data = ''
           rm -rf $HOME/.home-manager-share
           mkdir -p $HOME/.home-manager-share
@@ -72,57 +73,57 @@ in {
       ".local/bin/update-channel" = {
         executable = true;
         text = ''
-        #!/usr/bin/env bash
+          #!/usr/bin/env bash
 
-        _nix_version_file="$HOME/.config/nixpkgs/VERSION"
-        if [ -f $_nix_version_file ] ; then
-          _nix_version=$(cat $_nix_version_file)
-          _nix_channel=nixos-$_nix_version
-          nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
-        fi
+          _nix_version_file="$HOME/.config/nixpkgs/VERSION"
+          if [ -f $_nix_version_file ] ; then
+            _nix_version=$(cat $_nix_version_file)
+            _nix_channel=nixos-$_nix_version
+            nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
+          fi
 
-        nix-channel --update
-        nix-env -iA nixpkgs.nix
+          nix-channel --update
+          nix-env -iA nixpkgs.nix
         '';
       };
       ".local/bin/update-home" = {
         executable = true;
         text = ''
-        #!/usr/bin/env nix-shell
-        #!nix-shell -i bash -p home-manager
-        home-manager switch
-        update-desktop-database
+          #!/usr/bin/env nix-shell
+          #!nix-shell -i bash -p home-manager
+          home-manager switch
+          update-desktop-database
         '';
       };
       ".local/bin/home-generations" = {
         executable = true;
         text = ''
-        #!/usr/bin/env nix-shell
-        #!nix-shell -i bash -p home-manager
-        home-manager generations
+          #!/usr/bin/env nix-shell
+          #!nix-shell -i bash -p home-manager
+          home-manager generations
         '';
       };
       ".local/bin/home-generations-gc" = {
         executable = true;
         text = ''
-        #!/usr/bin/env nix-shell
-        #!nix-shell -i bash -p home-manager
-        home-manager expire-generations "${"\${1:--7 days}"}"
-        nix-store --gc
+          #!/usr/bin/env nix-shell
+          #!nix-shell -i bash -p home-manager
+          home-manager expire-generations "${"\${1:--7 days}"}"
+          nix-store --gc
         '';
       };
     };
     # Re-enable this after there is a method for pre-pending PATH
     # https://github.com/nix-community/home-manager/issues/3324
     /*
-    sessionPath = [
+      sessionPath = [
       "$HOME/.local/bin"
       "$HOME/bin"
       "$HOME/go/bin"
       "$HOME/.nix-profile/bin"
-    ];
+      ];
     */
-    sessionVariables = 
+    sessionVariables =
       let nixProfDir = "/nix/var/nix/profiles/per-user/$USER";
       in with lib.strings; {
         NIX_PATH = concatStringsSep ":" [
@@ -230,11 +231,11 @@ in {
           };
 
         in
-          nixgl.wrap (
-            pkgs.wrapMpv pkgs.mpv-unwrapped {
-              scripts = [ inhibit-gnome ];
-            }
-          );
+        nixgl.wrap (
+          pkgs.wrapMpv pkgs.mpv-unwrapped {
+            scripts = [ inhibit-gnome ];
+          }
+        );
 
       config = {
         script-opts = with lib.strings; concatStringsSep "," [
@@ -255,21 +256,21 @@ in {
       shortcut = "a";
       terminal = "screen-256color";
       extraConfig = ''
-      # Left Status
-      set -g status-left '[ #h:#S ] '
-      set -g status-left-length 30
+        # Left Status
+        set -g status-left '[ #h:#S ] '
+        set -g status-left-length 30
 
-      # Right Status
-      set -g status-right ' #{prefix_highlight} %A %m/%d | %H:%M '
-      set -g status-right-length 60
+        # Right Status
+        set -g status-right ' #{prefix_highlight} %A %m/%d | %H:%M '
+        set -g status-right-length 60
 
-      # Window title options
-      set-window-option -g window-status-style bright
-      set-window-option -g window-status-current-style bright
+        # Window title options
+        set-window-option -g window-status-style bright
+        set-window-option -g window-status-current-style bright
 
-      # Active window title colors
-      set -g window-status-format ' #I:#W#F '
-      set -g window-status-current-format '#[bg=white,fg=black] #I:#W#F '
+        # Active window title colors
+        set -g window-status-format ' #I:#W#F '
+        set -g window-status-current-format '#[bg=white,fg=black] #I:#W#F '
       '';
     };
 
