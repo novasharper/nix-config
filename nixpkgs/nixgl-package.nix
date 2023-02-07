@@ -9,23 +9,23 @@ let
       preferLocalBuild = true;
       allowSubstitues = false;
     } "cp /proc/modules $out 2> /dev/null || touch $out";
-  _driverMatch =
+  _moduleMatch =
     builtins.match
     ".*video [0-9]+ [0-9]+ (([a-z0-9_]+,)+) .*"
     (builtins.readFile _modulesFile);
-  videoDrivers =
+  videoModules =
     let
       data =
         if _driverMatch != null
         then builtins.split "," (builtins.head _driverMatch)
         else [];
     in
-      builtins.trace "[NixGL] Detected Drivers: ${builtins.toString data}" data;
-  # i915           = intel driver
-  # nvidia_modeset = nvidia driver
+      builtins.trace "[NixGL] Detected Modules: ${builtins.toString data}" data;
+  # i915           = intel module
+  # nvidia_modeset = nvidia module
   intelPresent =
     let
-      data = builtins.any (drv: drv == "i915") videoDrivers;
+      data = builtins.any (mod: mod == "i915") videoModules;
       strv = if data then "true" else "false";
     in
       builtins.trace "[NixGL] Intel Present: ${strv}" data;
