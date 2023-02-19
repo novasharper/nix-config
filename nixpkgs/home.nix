@@ -151,6 +151,7 @@ in
       };
     shellAliases = {
       e = "\${EDITOR:-emacs -nw}";
+      code = "codium";
       "rm~" = "find . -type f -name \\*~ -delete";
       rmTilda = "find . -type f -name \\*~ -delete";
       path = "echo -e \${PATH//:\\\\n}";
@@ -278,6 +279,10 @@ in
       package = pkgs.vscodium;
       extensions = with pkgs.vscode-extensions; [
         bbenoist.nix
+        golang.go
+        ms-python.python
+        redhat.vscode-yaml
+        rust-lang.rust-analyzer
       ];
       userSettings = {
         "files.autoSave" = "off";
