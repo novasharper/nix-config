@@ -275,9 +275,14 @@ in
     };
 
     vscode = enable {
+      package = pkgs.vscodium;
       extensions = with pkgs.vscode-extensions; [
         bbenoist.nix
       ];
+      userSettings = {
+        "files.autoSave" = "off";
+        "[nix]"."editor.tabSize" = 2;
+      };
     };
   };
 
