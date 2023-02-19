@@ -10,6 +10,7 @@ in
     zsh = enable {
       enableCompletion = true;
       enableSyntaxHighlighting = true;
+      enableVteIntegration = true;
       historySubstringSearch = {
         enable = true;
       };
@@ -22,6 +23,7 @@ in
     };
 
     bash = enable {
+      enableVteIntegration = true;
       bashrcExtra = shellCommon.envExtra;
       initExtra = ''
         if [ -f /etc/bashrc ] ; then
