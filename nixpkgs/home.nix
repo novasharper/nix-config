@@ -5,6 +5,11 @@ let
   nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
   enable = x: x // { enable = true; };
 
+  # package wrappers
+  pyradioWrapper = pkgs.pyradio.overrideAttrs (self: super: {
+    propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
+  });
+
 in
 {
   home = {
@@ -49,6 +54,7 @@ in
 
         # === general ===
         bat
+        catt # Cast ALL the things
         colordiff
         htop
         httpie
@@ -65,6 +71,7 @@ in
         # --- AV ---
         (nixgl.wrap celluloid)
         (nixgl.wrap obs-studio)
+        pyradioWrapper
         (nixgl.wrap vlc)
         # --- fonts ---
         office-code-pro
