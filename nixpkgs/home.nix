@@ -74,6 +74,7 @@ in
         executable = true;
         text = ''
           #!/usr/bin/env bash
+          set -e
 
           _nix_version_file="$HOME/.config/nixpkgs/VERSION"
           if [ -f $_nix_version_file ] ; then
@@ -91,7 +92,8 @@ in
         text = ''
           #!/usr/bin/env nix-shell
           #!nix-shell -i bash -p home-manager
-          home-manager switch
+          set -e
+          home-manager switch "$@"
           update-desktop-database
         '';
       };
@@ -108,6 +110,7 @@ in
         text = ''
           #!/usr/bin/env nix-shell
           #!nix-shell -i bash -p home-manager
+          set -e
           home-manager expire-generations "${"\${1:--7 days}"}"
           nix-store --gc
         '';
