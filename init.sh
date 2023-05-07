@@ -4,15 +4,32 @@ set -e
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 unset LD_LIBRARY_PATH
 
+case "$OSTYPE" in
+    darwin*)
+        os=macos
+        ;;
+    linux-gnu*)
+        os=linux
+        ;;
+esac
+
 if ! command -v nix-env &>/dev/null ; then
     echo "Installing NIX"
     sh ./install-nix.sh --no-channel-add
     # Ensure that nix is loaded
-    source $HOME/.nix-profile/etc/profile.d/nix.sh
+    if [[ "$os" == "macos" ]] ; then
+        source /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+    else
+        source $HOME/.nix-profile/etc/profile.d/nix.sh
+    fi
 fi
 
 NIXPKGS_VERSION=$(cat $CURRENT_DIR/nixpkgs/VERSION)
-NIXPKGS_CHANNEL=nixos-$NIXPKGS_VERSION
+if [[ "$os" == "macos" ]] ; then
+    NIXPKGS_CHANNEL=nixpkgs-$NIXPKGS_VERSION-darwin
+else
+    NIXPKGS_CHANNEL=nixos-$NIXPKGS_VERSION
+fi
 echo "Configuring nix to use the $NIXPKGS_VERSION channel"
 nix-channel --add https://nixos.org/channels/$NIXPKGS_CHANNEL nixpkgs
 nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl

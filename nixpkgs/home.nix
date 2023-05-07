@@ -10,25 +10,25 @@ let
     propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
   });
 
+  linuxPkgs = with pkgs; [
+    mypaint
+    (nixgl.wrap celluloid)
+    (nixgl.wrap obs-studio)
+    (nixgl.wrap vlc)
+  ];
+  darwinPkgs = with pkgs; [
+    libreoffice-bin
+  ];
+
 in
 {
   home = {
     username = "pllong";
-    homeDirectory = "/home/pllong";
-    activation = {
-      linkDesktopApplications = {
-        after = [
-          "writeBoundary"
-          "createXdgUserDirectories"
-        ];
-        before = [ ];
-        data = ''
-          rm -rf $HOME/.home-manager-share
-          mkdir -p $HOME/.home-manager-share
-          cp -Lr --no-preserve=mode,ownership ${config.home.homeDirectory}/.nix-profile/share/* $HOME/.home-manager-share
-        '';
-      };
-    };
+    homeDirectory =
+      if stdenv.isDarwin
+      then "/Users/pllong"
+      else "/home/pllong";
+
     packages = with pkgs;
       [
         # === languages ===
@@ -62,48 +62,21 @@ in
         kubernetes-helm
         mosh
         ncdu
+        ripgrep
+        rsync
         tmux
+        tree
         yt-dlp
         # --- Art ---
         gimp
         inkscape
-        mypaint
         # --- AV ---
-        (nixgl.wrap celluloid)
-        (nixgl.wrap obs-studio)
         pyradioWrapper
-        (nixgl.wrap vlc)
         # --- fonts ---
         office-code-pro
-      ];
+      ] ++ lib.optionals stdenv.isLinux  linuxPkgs
+        ++ lib.optionals stdenv.isDarwin darwinPkgs;
     file = {
-      ".local/bin/update-channel" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          set -e
-
-          _nix_version_file="$HOME/.config/nixpkgs/VERSION"
-          if [ -f $_nix_version_file ] ; then
-            _nix_version=$(cat $_nix_version_file)
-            _nix_channel=nixos-$_nix_version
-            nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
-          fi
-
-          nix-channel --update
-          nix-env -iA nixpkgs.nix
-        '';
-      };
-      ".local/bin/update-home" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env nix-shell
-          #!nix-shell -i bash -p home-manager
-          set -e
-          home-manager switch "$@"
-          update-desktop-database
-        '';
-      };
       ".local/bin/home-generations" = {
         executable = true;
         text = ''
@@ -234,29 +207,33 @@ in
     go.enable = true;
 
     mpv = enable {
-      package =
-        let
-          inhibit-gnome = import ./contrib/inhibit-gnome.nix {
-            inherit lib stdenv fetchFromGitHub;
-            inherit (pkgs) pkg-config dbus mpv-unwrapped;
-          };
-
-        in
-        nixgl.wrap (
-          pkgs.wrapMpv pkgs.mpv-unwrapped {
-            scripts = [ inhibit-gnome ];
-          }
-        );
-
       config = {
         script-opts = with lib.strings; concatStringsSep "," [
           "ytdl_hook-ytdl_path=${lib.getExe pkgs.yt-dlp}"
         ];
+      };
+    } // (
+      if stdenv.isLinux
+      then {
         # Vulkan API seems to be broken on Wayland
         gpu-api = "opengl";
         hwdec = "no";
-      };
-    };
+        package =
+          let
+            inhibit-gnome = import ./contrib/inhibit-gnome.nix {
+              inherit lib stdenv fetchFromGitHub;
+              inherit (pkgs) pkg-config dbus mpv-unwrapped;
+            };
+
+          in
+            nixgl.wrap (
+              pkgs.wrapMpv pkgs.mpv-unwrapped {
+                scripts = [ inhibit-gnome ];
+              }
+            );
+      }
+      else {}
+    );
 
     tmux = enable {
       plugins = with pkgs.tmuxPlugins; [
@@ -301,19 +278,10 @@ in
     };
   };
 
-  targets.genericLinux.enable = true;
-
-  xdg = enable {
-    mime.enable = true;
-    systemDirs.data = [
-      "$HOME/.home-manager-share"
-      "$HOME/.local/share"
-    ];
-  };
-
   imports = [
     ./git.nix
     ./shells.nix
     ./vim.nix
-  ];
+  ] ++ lib.optional stdenv.isLinux  ./linux.nix
+    ++ lib.optional stdenv.isDarwin ./darwin.nix;
 }
