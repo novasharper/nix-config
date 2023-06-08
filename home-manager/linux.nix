@@ -29,6 +29,7 @@
             _nix_version=$(cat $_nix_version_file)
             _nix_channel=nixos-$_nix_version
             nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
+            nix-channel --add https://github.com/nix-community/home-manager/archive/release-$_nix_version.tar.gz home-manager
           fi
 
           nix-channel --update
