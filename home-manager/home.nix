@@ -96,16 +96,12 @@ in
         '';
       };
     };
-    # Re-enable this after there is a method for pre-pending PATH
-    # https://github.com/nix-community/home-manager/issues/3324
-    /*
-      sessionPath = [
+    sessionPath = [
       "$HOME/.local/bin"
       "$HOME/bin"
       "$HOME/go/bin"
       "$HOME/.nix-profile/bin"
-      ];
-    */
+    ];
     sessionVariables =
       let nixProfDir = "/nix/var/nix/profiles/per-user/$USER";
       in with lib.strings; {
