@@ -264,11 +264,17 @@ in
         bbenoist.nix
         golang.go
         ms-python.python
+        ms-python.vscode-pylance
+        ms-pyright.pyright
+        redhat.java
         redhat.vscode-yaml
         rust-lang.rust-analyzer
       ];
+      enableExtensionUpdateCheck = false;
+      enableUpdateCheck = false;
       userSettings = {
         "files.autoSave" = "off";
+        "extensions.autoUpdate" = false;
         "[nix]"."editor.tabSize" = 2;
       };
     };
