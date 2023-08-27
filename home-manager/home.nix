@@ -207,13 +207,18 @@ in
         script-opts = with lib.strings; concatStringsSep "," [
           "ytdl_hook-ytdl_path=${lib.getExe pkgs.yt-dlp}"
         ];
-      };
+      } // (
+        # Vulkan API seems to be broken on Wayland
+        if stdenv.isLinux
+        then {
+          gpu-api = "opengl";
+          hwdec = "no";
+        }
+        else {}
+      );
     } // (
       if stdenv.isLinux
       then {
-        # Vulkan API seems to be broken on Wayland
-        gpu-api = "opengl";
-        hwdec = "no";
         package =
           let
             inhibit-gnome = import ./contrib/inhibit-gnome.nix {
