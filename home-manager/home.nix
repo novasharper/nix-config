@@ -54,7 +54,9 @@ in
 
         # === general ===
         bat
+        beancount
         catt # Cast ALL the things
+        (nixgl.wrap cemu)
         colordiff
         htop
         httpie
