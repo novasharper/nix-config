@@ -173,7 +173,7 @@ in
       krm = "kubectl delete";
       kns = "kubectl config set-context --current --namespace";
     };
-    stateVersion = "22.11";
+    stateVersion = "23.11";
   };
 
   news.display = "silent";
