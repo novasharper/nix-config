@@ -33,7 +33,7 @@ fi
 echo "Configuring nix to use the $NIXPKGS_VERSION channel"
 nix-channel --add https://nixos.org/channels/$NIXPKGS_CHANNEL nixpkgs
 nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
-sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-$NIXPKGS_VERSION.tar.gz home-manager
+nix-channel --add https://github.com/nix-community/home-manager/archive/release-$NIXPKGS_VERSION.tar.gz home-manager
 nix-channel --update
 
 if [[ ! -d ~/.config ]] ; then
