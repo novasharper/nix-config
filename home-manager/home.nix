@@ -113,6 +113,7 @@ in
           set -e
           home-manager expire-generations "${"\${1:--7 days}"}"
           nix-store --gc
+          nix-collect-garbage -d
         '';
       };
     };
