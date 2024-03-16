@@ -32,8 +32,9 @@
             nix-channel --add https://github.com/nix-community/home-manager/archive/release-$_nix_version.tar.gz home-manager
           fi
 
-          nix-channel --update
-          nix-env -iA nixpkgs.nix
+          echo "Updating channel" && nix-channel --update
+          echo "Installing latest nix" && nix-env -iA nixpkgs.nix
+          echo "Installing synced home-manager" && nix-env -iA home-manager.home-manager
         '';
       };
       ".local/bin/update-home" = {
