@@ -13,11 +13,17 @@ let
   linuxPkgs = with pkgs; [
     mypaint
     (nixgl.wrap celluloid)
+    (nixgl.wrap cemu)
     (nixgl.wrap obs-studio)
     (nixgl.wrap vlc)
+    # TODO does not seem to build on macos
+    # See https://github.com/NixOS/nixpkgs/issues/290512
+    ncdu
   ];
+
   darwinPkgs = with pkgs; [
     libreoffice-bin
+    gnupg
   ];
 
 in
@@ -56,14 +62,15 @@ in
         bat
         beancount
         catt # Cast ALL the things
-        (nixgl.wrap cemu)
         colordiff
+        exiv2
+        exiftool
+        gpxsee
         htop
         httpie
         jq
         kubernetes-helm
         mosh
-        ncdu
         ripgrep
         rsync
         tmux
