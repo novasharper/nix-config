@@ -54,4 +54,4 @@ fi
 echo "Initializing/updating user environment"
 NIX_PATH="$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/$USER/channels${NIX_PATH:+:$NIX_PATH}"
 export NIX_PATH
-nix-shell -p home-manager --run 'home-manager switch'
+nix-shell '<home-manager>' -A install

@@ -53,7 +53,7 @@
         executable = true;
         text = ''
           #!/usr/bin/env nix-shell
-          #!nix-shell -i bash -p home-manager
+          #!nix-shell <home-manager> -i bash -p home-manager
           set -e
           home-manager switch "$@"
         '';

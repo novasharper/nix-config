@@ -83,7 +83,7 @@ in
         executable = true;
         text = ''
           #!/usr/bin/env nix-shell
-          #!nix-shell -i bash -p home-manager
+          #!nix-shell <home-manager> -i bash -p home-manager
           home-manager generations
         '';
       };
@@ -91,7 +91,7 @@ in
         executable = true;
         text = ''
           #!/usr/bin/env nix-shell
-          #!nix-shell -i bash -p home-manager
+          #!nix-shell <home-manager> -i bash -p home-manager
           set -e
           home-manager expire-generations "${"\${1:--7 days}"}"
           nix-store --gc
