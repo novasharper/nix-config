@@ -14,11 +14,9 @@ in
   programs = {
     zsh = enable {
       enableCompletion = true;
-      enableSyntaxHighlighting = true;
+      syntaxHighlighting.enable = true;
       enableVteIntegration = true;
-      historySubstringSearch = {
-        enable = true;
-      };
+      historySubstringSearch.enable = true;
       oh-my-zsh = {
         enable = true;
         theme = "ys";
