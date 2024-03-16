@@ -26,6 +26,17 @@ let
     gnupg
   ];
 
+  vscode-local = with pkgs; {
+    Misode.vscode-nbt = vscode-utils.buildVscodeMarketplaceExtension {
+      mktplcRef = {
+        name = "vscode-nbt";
+        publisher = "Misodee";
+        version = "0.9.1";
+        sha256 = "6hl3TQLTjJwpF/oV+syVvxVxCNFKawBci3loyKiVJTY=";
+      };
+    };
+  };
+
 in
 {
   home = {
@@ -283,9 +294,11 @@ in
         redhat.java
         redhat.vscode-yaml
         rust-lang.rust-analyzer
+        vscode-local.Misode.vscode-nbt
       ];
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
+      mutableExtensionsDir = false;
       userSettings = {
         "files.autoSave" = "off";
         "extensions.autoUpdate" = false;
