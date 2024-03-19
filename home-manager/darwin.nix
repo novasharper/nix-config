@@ -46,7 +46,7 @@
             echo "Starting nix daemon" && launchctl load /Library/LaunchDaemons/org.nixos.nix-daemon.plist
           '
           echo "Installing latest nix" && nix-env -iA nixpkgs.nix
-          echo "Installing synced home-manager" && nix-env -iA home-manager.home-manager
+          #echo "Installing synced home-manager" && nix-env -iA home-manager.home-manager
         '';
       };
       ".local/bin/update-home" = {
