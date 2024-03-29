@@ -24,6 +24,7 @@ let
   darwinPkgs = with pkgs; [
     libreoffice-bin
     gnupg
+    ffmpeg
   ];
 
   vscode-local = with pkgs; {
