@@ -2,6 +2,7 @@
 
 {
   home = {
+    /*
     activation = {
       linkDesktopApplications = {
         after = [
@@ -16,6 +17,7 @@
         '';
       };
     };
+    */
 
     file = {
       ".local/bin/update-channel" = {
