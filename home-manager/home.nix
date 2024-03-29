@@ -35,6 +35,14 @@ let
         sha256 = "6hl3TQLTjJwpF/oV+syVvxVxCNFKawBci3loyKiVJTY=";
       };
     };
+    Lencerf.beancount = vscode-utils.buildVscodeMarketplaceExtension {
+      mktplcRef = {
+        name = "beancount";
+        publisher = "Lencerf";
+        version = "0.10.0";
+        sha256 = "xsGYr9Aqfoe16U9lACyGkTfknwMf0n2oOog498SS26Y=";
+      };
+    };
   };
 
 in
@@ -296,6 +304,7 @@ in
         redhat.java
         redhat.vscode-yaml
         rust-lang.rust-analyzer
+        vscode-local.Lencerf.beancount
         vscode-local.Misode.vscode-nbt
       ];
       enableExtensionUpdateCheck = false;
