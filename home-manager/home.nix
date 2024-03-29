@@ -71,11 +71,12 @@ in
 
         # === general ===
         bat
-        beancount
+        beancount # Text-based ledger
         catt # Cast ALL the things
         colordiff
         exiv2
         exiftool
+        fava # BeanCount Web UI
         gpxsee
         htop
         httpie
