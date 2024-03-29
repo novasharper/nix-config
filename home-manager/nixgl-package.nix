@@ -93,6 +93,10 @@ in
 rec {
   inherit intelPresent;
   inherit nvidiaPresent;
+  # Disabling untile https://github.com/nix-community/nixGL/pull/165 merges
+  # A previous PR added zstd to native build inputs, but the overlay is broken
+  # (in some cases?) because oldAttrs.buildInputs may not be defined.
+  /*
   package =
     if (builtins.length packages) > 1
     then
@@ -104,7 +108,7 @@ rec {
             exec ${
               builtins.toString (
                 builtins.map
-                  (pkg: lib.getExe (nixgl.nixGLCommon pkg))
+                  (pkg: lib.getExe' (nixgl.nixGLCommon pkg) "nixGL")
                   packages
               )
             } "$@"
@@ -112,4 +116,6 @@ rec {
         }
     else nixgl.auto.nixGLDefault;
   wrap = guiWrapFactory package;
+  */
+  wrap = pkg: pkg;
 }
