@@ -4,6 +4,9 @@ with import <nixpkgs> { };
 let
   nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
   enable = x: x // { enable = true; };
+  homedir = if stdenv.isDarwin then "/Users/pllong" else "/home/pllong";
+  confdir = "${homedir}/.config";
+  localConf = "${confdir}/nix-local/default.nix";
 
   # package wrappers
   pyradioWrapper = pkgs.pyradio.overrideAttrs (self: super: {
@@ -50,10 +53,7 @@ in
 {
   home = {
     username = "pllong";
-    homeDirectory =
-      if stdenv.isDarwin
-      then "/Users/pllong"
-      else "/home/pllong";
+    homeDirectory = homedir;
 
     packages = with pkgs;
       [
@@ -324,5 +324,6 @@ in
     ./shells.nix
     ./vim.nix
   ] ++ lib.optional stdenv.isLinux  ./linux.nix
-    ++ lib.optional stdenv.isDarwin ./darwin.nix;
+    ++ lib.optional stdenv.isDarwin ./darwin.nix
+    ++ lib.optional (builtins.pathExists localConf) localConf;
 }
