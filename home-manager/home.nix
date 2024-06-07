@@ -25,9 +25,11 @@ let
   ];
 
   darwinPkgs = with pkgs; [
-    libreoffice-bin
-    gnupg
     ffmpeg
+    gnupg
+    keepassxc
+    libreoffice-bin
+    wget
   ];
 
   vscode-local = with pkgs; {
@@ -292,6 +294,7 @@ in
         redhat.java
         redhat.vscode-yaml
         rust-lang.rust-analyzer
+        tamasfe.even-better-toml
         vscode-local.Lencerf.beancount
         vscode-local.Misode.vscode-nbt
       ];
