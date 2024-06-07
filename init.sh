@@ -52,6 +52,6 @@ if [[ ! -d ~/.config/home-manager ]] ; then
 fi
 
 echo "Initializing/updating user environment"
-NIX_PATH="$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/$USER/channels${NIX_PATH:+:$NIX_PATH}"
+NIX_PATH="$HOME/.nix-defexpr/channels:$HOME/.local/state/nix/profiles/channels:/nix/var/nix/profiles/per-user/$USER/channels${NIX_PATH:+:$NIX_PATH}"
 export NIX_PATH
 nix-shell '<home-manager>' -A install

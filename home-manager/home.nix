@@ -132,31 +132,18 @@ in
       "$HOME/bin"
       "$HOME/go/bin"
       "$HOME/.nix-profile/bin"
+      "/nix/var/nix/profiles/default/bin"
     ];
     sessionVariables =
-      let nixProfDir = "/nix/var/nix/profiles/per-user/$USER";
+      let
+        globalChannelDir = "/nix/var/nix/profiles/per-user/$USER/channels";
+        localChannelDir = "$HOME/.local/state/nix/profiles/channels";
       in with lib.strings; {
-        NIX_PATH = concatStringsSep ":" [
-          "$HOME/.nix-defexpr/channels"
-          "${nixProfDir}/channels"
-        ];
-        /*
-        PKG_CONFIG_PATH = concatStringsSep ":" [
-          "$HOME/.nix-profile/lib/pkgconfig"
-          "${nixProfDir}/profile/lib/pkgconfig"
-          #"/usr/share/pkgconfig"
-          #"/usr/lib64/pkgconfig"
-          #"/usr/local/lib/pkgconfig"
-        ];
-        LD_LIBRARY_PATH = concatStringsSep ":" [
-          "$HOME/.nix-profile/lib"
-          "${nixProfDir}/profile/lib/pkgconfig"
-          #"/usr/lib64"
-          #"/usr/lib"
-          #"/usr/local/lib64"
-          #"/usr/local/lib"
-        ];
-        */
+        NIX_PATH = concatStringsSep ":" (
+          [ "$HOME/.nix-defexpr/channels" ]
+          ++ lib.optional (builtins.pathExists globalChannelDir) globalChannelDir
+          ++ lib.optional (builtins.pathExists localChannelDir) localChannelDir
+        );
         EDITOR = "${lib.getExe pkgs.vim}";
       };
     shellAliases = {
