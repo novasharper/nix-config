@@ -35,7 +35,7 @@
           fi
 
           echo "Updating channel" && nix-channel --update
-          echo "Installing latest nix" && nix-env -iA nixpkgs.nix
+          echo "Installing latest nix" && nix-env -iA nixpkgs.nixVersions.latest
           #echo "Installing synced home-manager" && nix-env -iA home-manager.home-manager
         '';
       };
