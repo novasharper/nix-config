@@ -43,7 +43,8 @@
           sudo -i sh -c '
             echo "Stopping nix daemon" && launchctl remove org.nixos.nix-daemon &&
             echo "Sleeping for 5 seconds" && sleep 5 &&
-            echo "Starting nix daemon" && launchctl load /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+            echo "Starting nix daemon" && launchctl load /Library/LaunchDaemons/org.nixos.nix-daemon.plist &&
+            echo "Sleeping for 5 seconds" && sleep 5
           '
           echo "Installing latest nix" && nix-env -iA nixpkgs.nixVersions.latest
           #echo "Installing synced home-manager" && nix-env -iA home-manager.home-manager
