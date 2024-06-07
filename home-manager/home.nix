@@ -4,7 +4,8 @@ with import <nixpkgs> { };
 let
   nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
   enable = x: x // { enable = true; };
-  homedir = if stdenv.isDarwin then "/Users/pllong" else "/home/pllong";
+  username = "pllong";
+  homedir = if stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
   confdir = "${homedir}/.config";
   localConf = "${confdir}/nix-local/default.nix";
 
@@ -54,7 +55,7 @@ let
 in
 {
   home = {
-    username = "pllong";
+    username = username;
     homeDirectory = homedir;
 
     packages = with pkgs;
@@ -138,11 +139,13 @@ in
     ];
     sessionVariables =
       let
-        globalChannelDir = "/nix/var/nix/profiles/per-user/$USER/channels";
-        localChannelDir = "$HOME/.local/state/nix/profiles/channels";
+        rootChannelDir = "/nix/var/nix/profiles/per-user/root/channels";
+        globalChannelDir = "/nix/var/nix/profiles/per-user/${username}/channels";
+        localChannelDir = "${homedir}/.local/state/nix/profiles/channels";
       in with lib.strings; {
         NIX_PATH = concatStringsSep ":" (
           [ "$HOME/.nix-defexpr/channels" ]
+          ++ lib.optional (builtins.pathExists rootChannelDir) rootChannelDir
           ++ lib.optional (builtins.pathExists globalChannelDir) globalChannelDir
           ++ lib.optional (builtins.pathExists localChannelDir) localChannelDir
         );
