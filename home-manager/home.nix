@@ -14,6 +14,13 @@ let
     propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
   });
 
+  pythonEnv = python312.withPackages (ps: [
+    ps.pylint
+    ps.setuptools
+    ps.tox
+    ps.virtualenv
+  ]);
+
   linuxPkgs = with pkgs; [
     mypaint
     (nixgl.wrap celluloid)
@@ -70,6 +77,9 @@ in
         golangci-lint
         gopls
         gotools
+        # --- python ---
+        pythonEnv
+        pipenv
         # --- nix ---
         nixpkgs-fmt
         nixpkgs-lint
