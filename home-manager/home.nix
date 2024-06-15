@@ -27,9 +27,6 @@ let
     (nixgl.wrap cemu)
     (nixgl.wrap obs-studio)
     (nixgl.wrap vlc)
-    # TODO does not seem to build on macos
-    # See https://github.com/NixOS/nixpkgs/issues/290512
-    ncdu
   ];
 
   darwinPkgs = with pkgs; [
@@ -105,6 +102,7 @@ in
         jq
         kubernetes-helm
         mosh
+        ncdu
         ripgrep
         rsync
         tmux
