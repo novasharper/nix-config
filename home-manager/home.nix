@@ -23,6 +23,7 @@ let
 
   linuxPkgs = with pkgs; [
     mypaint
+    ncdu
     (nixgl.wrap celluloid)
     (nixgl.wrap cemu)
     (nixgl.wrap obs-studio)
@@ -102,7 +103,6 @@ in
         jq
         kubernetes-helm
         mosh
-        ncdu
         ripgrep
         rsync
         tmux
