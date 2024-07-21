@@ -301,7 +301,6 @@ in
         golang.go
         ms-python.python
         ms-python.vscode-pylance
-        ms-pyright.pyright
         redhat.java
         redhat.vscode-yaml
         rust-lang.rust-analyzer
