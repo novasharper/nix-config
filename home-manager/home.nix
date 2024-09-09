@@ -96,6 +96,7 @@ in
         colordiff
         exiv2
         exiftool
+        qpdf
         fava # BeanCount Web UI
         gpxsee
         htop
@@ -103,6 +104,7 @@ in
         jq
         kubernetes-helm
         mosh
+        fastfetch
         ripgrep
         rsync
         tmux
