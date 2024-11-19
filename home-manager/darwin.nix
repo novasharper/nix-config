@@ -14,9 +14,9 @@
         in lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           baseDir="$HOME/Applications/Home Manager Apps"
           if [ -d "$baseDir" ]; then
-            rm -rf "$baseDir"
+            $DRY_RUN_CMD rm -rf "$baseDir"
           fi
-          mkdir -p "$baseDir"
+          $DRY_RUN_CMD mkdir -p "$baseDir"
           for appFile in ${apps}/Applications/*; do
             target="$baseDir/$(basename "$appFile")"
             $DRY_RUN_CMD cp ''${VERBOSE_ARG:+-v} -fHRL "$appFile" "$baseDir"
@@ -37,6 +37,7 @@
             _nix_channel=nixpkgs-$_nix_version-darwin
             nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
             nix-channel --add https://github.com/nix-community/home-manager/archive/release-$_nix_version.tar.gz home-manager
+            nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
           fi
 
           echo "Updating channel" && nix-channel --update

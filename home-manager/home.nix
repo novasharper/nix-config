@@ -3,6 +3,7 @@
 with import <nixpkgs> { };
 let
   nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
+  fenix = import <fenix> { };
   enable = x: x // { enable = true; };
   username = "pllong";
   homedir = if stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
@@ -82,12 +83,14 @@ in
         nixpkgs-fmt
         nixpkgs-lint
         # --- rust-lang ---
-        cargo
-        cargo-binutils
-        cargo-edit
-        rustc
-        rustfmt
-        rust-analyzer
+        # cargo
+        # cargo-binutils
+        # cargo-edit
+        # rustc
+        # rustfmt
+        # rust-analyzer
+        fenix.stable.completeToolchain
+        cargo-expand
 
         # === general ===
         bat

@@ -32,6 +32,7 @@
             _nix_channel=nixos-$_nix_version
             nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
             nix-channel --add https://github.com/nix-community/home-manager/archive/release-$_nix_version.tar.gz home-manager
+            nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
           fi
 
           echo "Updating channel" && nix-channel --update
