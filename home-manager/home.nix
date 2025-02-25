@@ -112,7 +112,6 @@ in
         rsync
         tmux
         tree
-        yt-dlp
         # --- Art ---
         gimp
         inkscape
@@ -321,6 +320,13 @@ in
         "extensions.autoUpdate" = false;
         "[nix]"."editor.tabSize" = 2;
       };
+    };
+
+    yt-dlp = enable {
+      extraConfig = ''
+        --alias --yt '-f "bv*[vcodec^=avc]+ba[ext=m4a]/b[ext=mp4]/b"'
+        --alias --subdl '--embed-subs --sub-langs all,-llive_chat --convert-subs srt'
+      '';
     };
   };
 
