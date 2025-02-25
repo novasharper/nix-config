@@ -327,7 +327,7 @@ in
 
     yt-dlp = enable {
       extraConfig = ''
-        --alias --yt '-f "bv*[vcodec^=avc]+ba[ext=m4a]/b[ext=mp4]/b"'
+        --alias --yt '-f "bv*[vcodec^=avc]+ba[ext=m4a]/b[ext=mp4]/b" --sleep-requests 1.5 --min-sleep-interval 30 --max-sleep-interval 60'
         --alias --subdl '--embed-subs --sub-langs all,-llive_chat --convert-subs srt'
       '';
     };
