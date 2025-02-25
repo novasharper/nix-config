@@ -23,6 +23,7 @@ let
   ]);
 
   linuxPkgs = with pkgs; [
+    makemkv
     mypaint
     ncdu
     (nixgl.wrap celluloid)
@@ -107,7 +108,6 @@ in
         httpie
         jq
         kubernetes-helm
-        makemkv
         mosh
         fastfetch
         ripgrep
