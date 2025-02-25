@@ -3,7 +3,7 @@
 with import <nixpkgs> { };
 let
   nixgl = import <nixgl> { };
-  guiWrapFactory = nixGLPkg: (
+  guiWrapFactory = nixGLPkg: exeName: (
     pkg: pkgs.runCommandLocal
       "${pkg.name}-nixgui-wrapper"
       {
@@ -20,7 +20,7 @@ let
         # nixGL causes all software ran under it to gain nixGL status; https://github.com/guibou/nixGL/issues/116
         # we wrap packages with nixGL; it customizes LD_LIBRARY_PATH and related
         # envs so that nixpkgs find a compatible OpenGL driver
-        nixgl_bin="${lib.getExe nixGLPkg}"
+        nixgl_bin="${lib.getExe' nixGLPkg exeName}"
         # Similar to OpenGL, the executables installed by nix cannot find the GTK modules
         # required by the environment. The workaround is to unset the GTK_MODULES and
         # GTK3_MODULES so that it does not reach for system GTK modules.
@@ -93,10 +93,6 @@ in
 rec {
   inherit intelPresent;
   inherit nvidiaPresent;
-  # Disabling untile https://github.com/nix-community/nixGL/pull/165 merges
-  # A previous PR added zstd to native build inputs, but the overlay is broken
-  # (in some cases?) because oldAttrs.buildInputs may not be defined.
-  /*
   package =
     if (builtins.length packages) > 1
     then
@@ -115,7 +111,8 @@ rec {
           '';
         }
     else nixgl.auto.nixGLDefault;
-  wrap = guiWrapFactory package;
-  */
-  wrap = pkg: pkg;
+  wrap =
+    if (builtins.length packages) > 1
+    then guiWrapFactory package "nixGLCompose"
+    else guiWrapFactory package "nixGL";
 }
