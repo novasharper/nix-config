@@ -101,11 +101,13 @@ in
         exiftool
         qpdf
         fava # BeanCount Web UI
+        fusee-interfacee-tk
         gpxsee
         htop
         httpie
         jq
         kubernetes-helm
+        makemkv
         mosh
         fastfetch
         ripgrep
