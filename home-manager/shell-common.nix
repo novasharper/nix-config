@@ -11,23 +11,21 @@
     stt_tab   () { setTerminalText 1 $@; }
     stt_title () { setTerminalText 2 $@; }
     # git
+    function _get_gitroot {
+      for _start in main master m/master origin/HEAD ; do
+        if git rev-parse -q --verify $_start &>/dev/null ; then
+          echo $_start
+          return
+        fi
+      done
+      echo "Could not detect correct root ref for log" >&2
+      echo main
+    }
     function glm {
-      START=master
-      if git rev-parse -q --verify m/master >/dev/null ; then
-        START=m/master
-      elif git rev-parse -q --verify origin/HEAD >/dev/null ; then
-        START=origin/HEAD
-      fi
-      git log --graph --oneline --branches $START~1..HEAD "$@"
+      git log --graph --oneline --branches $(_get_gitroot)~1..HEAD "$@"
     }
     function glm1 {
-      START=master
-      if git rev-parse -q --verify m/master >/dev/null ; then
-        START=m/master
-      elif git rev-parse -q --verify origin/HEAD >/dev/null ; then
-        START=origin/HEAD
-      fi
-      git log --graph --oneline $START~1..HEAD "$@"
+      git log --graph --oneline $(_get_gitroot)~1..HEAD "$@"
     }
     # golang
     function list_imports {
