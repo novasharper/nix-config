@@ -307,6 +307,7 @@ in
         golang.go
         ms-python.python
         ms-python.vscode-pylance
+        ms-vscode-remote.remote-ssh
         redhat.java
         redhat.vscode-yaml
         rust-lang.rust-analyzer
