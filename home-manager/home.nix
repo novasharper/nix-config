@@ -265,7 +265,7 @@ in
 
           in
             nixgl.wrap (
-              pkgs.wrapMpv pkgs.mpv-unwrapped {
+              pkgs.mpv.override {
                 scripts = [ inhibit-gnome ];
               }
             );
