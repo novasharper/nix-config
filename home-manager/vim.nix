@@ -7,7 +7,9 @@
       ale
       lightline-ale
       lightline-vim
+      nerdtree
       rust-vim
+      vim-fugitive
       vim-polyglot
       vim-sensible
     ];
@@ -30,7 +32,7 @@
         let &l:shiftwidth = a:n
         let &l:expandtab = 1
       endfun
-      autocmd FileType python call SetTabstop(3)
+      autocmd FileType python call SetTabstop(4)
       autocmd FileType groovy call SetTabstop(4)
       autocmd FileType sh call SetTabstop(3)
       autocmd FileType go call SetTabstop(6)
