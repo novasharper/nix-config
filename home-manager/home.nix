@@ -35,7 +35,8 @@ let
   darwinPkgs = with pkgs; [
     ffmpeg
     gnupg
-    keepassxc
+    # TODO: Broken
+    #keepassxc
     libreoffice-bin
     wget
   ];
@@ -61,13 +62,6 @@ let
 
 in
 {
-  # TODO: Remove after bug is fixed
-  nixpkgs.overlays = [
-    (self: super: {
-      nodejs = super.nodejs_22;
-      nodejs-slim = super.nodejs-slim_22;
-    })
-  ];
   home = {
     username = username;
     homeDirectory = homedir;
@@ -309,27 +303,29 @@ in
 
     vscode = enable {
       package = pkgs.vscodium;
-      extensions = with pkgs.vscode-extensions; [
-        bbenoist.nix
-        golang.go
-        ms-python.python
-        ms-python.vscode-pylance
-        ms-vscode-remote.remote-ssh
-        redhat.java
-        redhat.vscode-yaml
-        rust-lang.rust-analyzer
-        tamasfe.even-better-toml
-        vscode-local.Lencerf.beancount
-        vscode-local.Misode.vscode-nbt
-      ];
-      enableExtensionUpdateCheck = false;
-      enableUpdateCheck = false;
-      mutableExtensionsDir = false;
-      userSettings = {
-        "files.autoSave" = "off";
-        "extensions.autoUpdate" = false;
-        "[nix]"."editor.tabSize" = 2;
+      profiles.default = {
+        extensions = with pkgs.vscode-extensions; [
+          bbenoist.nix
+          golang.go
+          ms-python.python
+          ms-python.vscode-pylance
+          ms-vscode-remote.remote-ssh
+          redhat.java
+          redhat.vscode-yaml
+          rust-lang.rust-analyzer
+          tamasfe.even-better-toml
+          vscode-local.Lencerf.beancount
+          vscode-local.Misode.vscode-nbt
+        ];
+        enableExtensionUpdateCheck = false;
+        enableUpdateCheck = false;
+        userSettings = {
+          "files.autoSave" = "off";
+          "extensions.autoUpdate" = false;
+          "[nix]"."editor.tabSize" = 2;
+        };
       };
+      mutableExtensionsDir = false;
     };
 
     yt-dlp = enable {
