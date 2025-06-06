@@ -119,7 +119,8 @@ in
         gimp
         inkscape
         # --- AV ---
-        pyradioWrapper
+        # Disabling because I don't really seem to be using this
+        #pyradioWrapper
         # --- fonts ---
         office-code-pro
       ] ++ lib.optionals stdenv.isLinux  linuxPkgs
