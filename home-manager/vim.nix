@@ -57,6 +57,9 @@
       filetype plugin indent on
       set hlsearch
       hi Normal guibg=NONE ctermbg=NONE
+      hi CursorLine cterm=NONE ctermbg=darkgray ctermfg=NONE
+      hi Visual cterm=NONE ctermbg=darkgray ctermfg=NONE
+      nnoremap h :set cursorline! cursorcolumn!<Cr>
 
       let g:go_version_warning = 0
       let g:go_fmt_command = "goimports"
