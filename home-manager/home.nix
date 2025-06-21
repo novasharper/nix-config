@@ -38,6 +38,7 @@ let
     # TODO: Broken
     #keepassxc
     libreoffice-bin
+    ncdu
     wget
   ];
 
@@ -76,7 +77,6 @@ in
         clang-tools
         # --- go ---
         golangci-lint
-        gopls
         gotools
         # --- python ---
         pythonEnv
