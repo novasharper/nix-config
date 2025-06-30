@@ -22,7 +22,7 @@ in
         theme = "ys";
       };
       profileExtra = profileExtra;
-      initExtra = shellCommon.initExtra;
+      initContent = lib.mkOrder 1000 shellCommon.initExtra;
     };
 
     bash = enable {
