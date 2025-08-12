@@ -57,8 +57,8 @@
       filetype plugin indent on
       set hlsearch
       hi Normal guibg=NONE ctermbg=NONE
-      hi CursorLine cterm=NONE ctermbg=darkgray ctermfg=NONE
-      hi Visual cterm=NONE ctermbg=darkgray ctermfg=NONE
+      hi CursorLine cterm=NONE ctermbg=lightgray ctermfg=NONE
+      hi Visual cterm=NONE ctermbg=lightgray ctermfg=NONE
       nnoremap h :set cursorline! cursorcolumn!<Cr>
 
       let g:go_version_warning = 0
