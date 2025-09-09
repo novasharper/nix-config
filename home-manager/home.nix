@@ -26,10 +26,10 @@ let
     makemkv
     mypaint
     ncdu
-    (nixgl.wrap celluloid)
+    # (nixgl.wrap celluloid)
     (nixgl.wrap cemu)
     (nixgl.wrap obs-studio)
-    (nixgl.wrap vlc)
+    # (nixgl.wrap vlc)
   ];
 
   darwinPkgs = with pkgs; [
