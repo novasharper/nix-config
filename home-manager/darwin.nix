@@ -40,15 +40,14 @@
             nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
           fi
 
-          echo "Updating channel" && nix-channel --update
-          sudo -i sh -c '
-            echo "Stopping nix daemon" && launchctl remove org.nixos.nix-daemon &&
-            echo "Sleeping for 5 seconds" && sleep 5 &&
-            echo "Starting nix daemon" && launchctl load /Library/LaunchDaemons/org.nixos.nix-daemon.plist &&
-            echo "Sleeping for 5 seconds" && sleep 5
-          '
-          echo "Installing latest nix" && nix-env -iA nixpkgs.nixVersions.latest
-          #echo "Installing synced home-manager" && nix-env -iA home-manager.home-manager
+          echo "Updating channel"
+          nix-channel --update
+
+          echo "Restarting nix daemon"
+          sudo launchctl kickstart -k system/org.nixos.nix-daemon
+
+          echo "Installing latest nix"
+          nix-env -iA nixpkgs.nixVersions.latest
         '';
       };
       ".local/bin/update-home" = {

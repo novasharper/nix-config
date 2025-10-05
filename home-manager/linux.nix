@@ -35,9 +35,11 @@
             nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
           fi
 
-          echo "Updating channel" && nix-channel --update
-          echo "Installing latest nix" && nix-env -iA nixpkgs.nixVersions.latest
-          #echo "Installing synced home-manager" && nix-env -iA home-manager.home-manager
+          echo "Updating channel"
+          nix-channel --update
+
+          echo "Installing latest nix"
+          nix-env -iA nixpkgs.nixVersions.latest
         '';
       };
       ".local/bin/update-home" = {
