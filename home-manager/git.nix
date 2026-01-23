@@ -3,9 +3,7 @@
 {
   programs.git = {
     enable = true;
-    userName = "Pat Long";
-    userEmail = "pat@novasharper.net";
-    extraConfig = {
+    settings = {
       color = {
         branch = {
           current = "yellow reverse";
@@ -41,6 +39,10 @@
       };
       rebase = {
         autosquash = "true";
+      };
+      user = {
+        name = "Pat Long";
+        email = "pat@novasharper.net";
       };
     };
     ignores = [
