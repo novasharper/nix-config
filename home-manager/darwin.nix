@@ -12,9 +12,15 @@
           _nix_version_file="$HOME/.config/nixpkgs/VERSION"
           if [ -f $_nix_version_file ] ; then
             _nix_version=$(cat $_nix_version_file)
-            _nix_channel=nixpkgs-$_nix_version-darwin
+            if [[ $_nix_version == unstable ]] ; then
+              _nix_channel=nixpkgs-unstable
+              _home_mgr_channel=master.tar.gz
+            else
+              _nix_channel=nixpkgs-$_nix_version-darwin
+              _home_mgr_channel=release-$_nix_version.tar.gz
+            fi
             nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
-            nix-channel --add https://github.com/nix-community/home-manager/archive/release-$_nix_version.tar.gz home-manager
+            nix-channel --add https://github.com/nix-community/home-manager/archive/$_home_mgr_channel home-manager
             nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
           fi
 
