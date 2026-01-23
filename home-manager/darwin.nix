@@ -22,7 +22,10 @@
           nix-channel --update
 
           echo "Restarting nix daemon"
-          sudo launchctl kickstart -k system/org.nixos.nix-daemon
+          if ! sudo launchctl kickstart -k system/org.nixos.nix-daemon ; then
+            echo "Failed... Retrying"
+            sudo launchctl kickstart system/org.nixos.nix-daemon
+          fi
 
           echo "Installing latest nix"
           nix-env -iA nixpkgs.nixVersions.latest
