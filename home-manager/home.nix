@@ -23,6 +23,7 @@ let
   ]);
 
   linuxPkgs = with pkgs; [
+    gimp
     makemkv
     mypaint
     ncdu
@@ -116,7 +117,7 @@ in
         tmux
         tree
         # --- Art ---
-        gimp
+        #gimp
         inkscape
         # --- AV ---
         # Disabling because I don't really seem to be using this
