@@ -310,6 +310,7 @@ in
           golang.go
           ms-python.python
           ms-python.vscode-pylance
+          ms-vscode-remote.remote-containers
           ms-vscode-remote.remote-ssh
           redhat.java
           redhat.vscode-yaml
@@ -321,8 +322,9 @@ in
         enableExtensionUpdateCheck = false;
         enableUpdateCheck = false;
         userSettings = {
-          "files.autoSave" = "off";
+          "dev.containers.dockerPath" = "podman";
           "extensions.autoUpdate" = false;
+          "files.autoSave" = "off";
           "[nix]"."editor.tabSize" = 2;
         };
       };
