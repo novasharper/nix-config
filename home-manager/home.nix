@@ -228,6 +228,9 @@ in
     dircolors.enable = true;
     home-manager.enable = true;
 
+    # TODO: Figure out which settings to use
+    gemini-cli = enable {};
+
     gh = enable {
       settings = {
         git_protocol = "https";
