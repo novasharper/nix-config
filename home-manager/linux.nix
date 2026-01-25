@@ -2,23 +2,6 @@
 
 {
   home = {
-    /*
-    activation = {
-      linkDesktopApplications = {
-        after = [
-          "writeBoundary"
-          "createXdgUserDirectories"
-        ];
-        before = [ ];
-        data = ''
-          rm -rf $HOME/.home-manager-share
-          mkdir -p $HOME/.home-manager-share
-          cp -Lr --no-preserve=mode,ownership ${config.home.homeDirectory}/.nix-profile/share/* $HOME/.home-manager-share
-        '';
-      };
-    };
-    */
-
     file = {
       ".local/bin/update-channel" = {
         executable = true;
