@@ -34,7 +34,12 @@
           fi
 
           echo "Installing latest nix"
-          nix-env -iA nixpkgs.nixVersions.latest
+          if ! nix-env -iA nixpkgs.nixVersions.latest 2> /dev/null ; then
+            echo "Failed... Retrying"
+            sudo launchctl kickstart system/org.nixos.nix-daemon
+            echo "Installing latest nix"
+            nix-env -iA nixpkgs.nixVersions.latest
+          fi
         '';
       };
       ".local/bin/update-home" = {
