@@ -55,8 +55,7 @@
                 inherit pkgs;
                 modules = [
                   ./home.nix
-                ] ++ nixpkgs.lib.optional pkgs.stdenv.isLinux  ./linux.nix
-                  ++ nixpkgs.lib.optional pkgs.stdenv.isDarwin ./darwin.nix;
+                ];
                 extraSpecialArgs = {
                   inherit inputs outputs pkgs;
                 };

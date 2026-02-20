@@ -351,5 +351,7 @@ in
     ./git.nix
     ./shells.nix
     ./vim.nix
-  ] ++ lib.optional (builtins.pathExists localConf) localConf;
+  ] ++ lib.optional (builtins.pathExists localConf) localConf
+    ++ lib.optional stdenv.isLinux  ./linux.nix
+    ++ lib.optional stdenv.isDarwin ./darwin.nix;
 }

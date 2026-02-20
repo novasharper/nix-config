@@ -36,7 +36,8 @@
         text = ''
           #!/usr/bin/env bash
           set -e
-          home-manager switch --flake ~/.config/home-manager
+          nix flake update --flake ~/.config/home-manager
+          home-manager switch --flake ~/.config/home-manager#pllong
           update-desktop-database
         '';
       };
