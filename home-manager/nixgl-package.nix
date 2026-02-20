@@ -1,8 +1,6 @@
 { config, pkgs, lib, ... }:
 
-with import <nixpkgs> { };
 let
-  nixgl = import <nixgl> { };
   guiWrapFactory = nixGLPkg: exeName: (
     pkg: pkgs.runCommandLocal
       "${pkg.name}-nixgui-wrapper"
@@ -72,6 +70,7 @@ let
     builtins.trace "[NixGL] Detected Modules: ${builtins.toString data}" data;
   # i915           = intel module
   # nvidia_modeset = nvidia module
+  # TODO: Radeon
   intelPresent =
     let
       data = builtins.any (mod: mod == "i915") videoModules;
@@ -85,8 +84,8 @@ let
     in
     builtins.trace "[NixGL] NVIDIA Present: ${strv}" data;
   packages =
-    lib.optional intelPresent nixgl.nixGLIntel
-    ++ lib.optional nvidiaPresent nixgl.auto.nixGLNvidia;
+    lib.optional intelPresent pkgs.nixgl.nixGLIntel
+    ++ lib.optional nvidiaPresent pkgs.nixgl.auto.nixGLNvidia;
 
 
 in
@@ -104,13 +103,13 @@ rec {
             exec ${
               builtins.toString (
                 builtins.map
-                  (pkg: lib.getExe' (nixgl.nixGLCommon pkg) "nixGL")
+                  (pkg: lib.getExe' (pkgs.nixgl.nixGLCommon pkg) "nixGL")
                   packages
               )
             } "$@"
           '';
         }
-    else nixgl.auto.nixGLDefault;
+    else pkgs.nixgl.auto.nixGLDefault;
   wrap =
     if (builtins.length packages) > 1
     then guiWrapFactory package "nixGLCompose"

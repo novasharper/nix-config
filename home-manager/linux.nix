@@ -34,10 +34,9 @@
       ".local/bin/update-home" = {
         executable = true;
         text = ''
-          #!/usr/bin/env nix-shell
-          #!nix-shell <home-manager> -i bash -p home-manager
+          #!/usr/bin/env bash
           set -e
-          home-manager switch "$@"
+          home-manager switch --flake ~/.config/home-manager
           update-desktop-database
         '';
       };

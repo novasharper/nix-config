@@ -1,9 +1,13 @@
-{ config, pkgs, lib, ... }:
+{ config,
+  pkgs,
+  lib,
+  fetchFromGitHub,
+  ...
+}:
 
-with import <nixpkgs> { };
 let
+  stdenv = pkgs.stdenv;
   nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
-  fenix = import <fenix> { };
   enable = x: x // { enable = true; };
   username = "pllong";
   homedir = if stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
@@ -15,7 +19,7 @@ let
     propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
   });
 
-  pythonEnv = python312.withPackages (ps: [
+  pythonEnv = pkgs.python312.withPackages (ps: [
     ps.pylint
     ps.setuptools
     ps.tox
@@ -347,7 +351,5 @@ in
     ./git.nix
     ./shells.nix
     ./vim.nix
-  ] ++ lib.optional stdenv.isLinux  ./linux.nix
-    ++ lib.optional stdenv.isDarwin ./darwin.nix
-    ++ lib.optional (builtins.pathExists localConf) localConf;
+  ] ++ lib.optional (builtins.pathExists localConf) localConf;
 }
