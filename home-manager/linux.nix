@@ -1,50 +1,54 @@
-{ config, pkgs, lib, ... }:
+{ config,
+  pkgs,
+  lib,
+  fetchFromGitHub,
+  nixVersion,
+  ...
+}:
 
+let
+  nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
+  enable = x: x // { enable = true; };
+
+in
 {
-  home = {
-    file = {
-      ".local/bin/update-channel" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          set -e
-
-          _nix_version_file="$HOME/.config/nixpkgs/VERSION"
-          if [ -f $_nix_version_file ] ; then
-            _nix_version=$(cat $_nix_version_file)
-            if [[ $_nix_version == unstable ]] ; then
-              _nix_channel=nixos-unstable
-              _home_mgr_channel=master.tar.gz
-            else
-              _nix_channel=nixos-$_nix_version
-              _home_mgr_channel=release-$_nix_version.tar.gz
-            fi
-            nix-channel --add https://nixos.org/channels/$_nix_channel nixpkgs
-            nix-channel --add https://github.com/nix-community/home-manager/archive/$_home_mgr_channel home-manager
-            nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
-          fi
-
-          echo "Updating channel"
-          nix-channel --update
-
-          echo "Installing latest nix"
-          nix-env -iA nixpkgs.nixVersions.latest
-        '';
-      };
-      ".local/bin/update-home" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          set -e
-          nix flake update --flake ~/.config/home-manager
-          home-manager switch --flake ~/.config/home-manager#pllong
-          update-desktop-database
-        '';
-      };
-    };
-  };
-
   targets.genericLinux.enable = true;
+
+  home.packages = with pkgs; [
+    gimp
+    makemkv
+    mypaint
+    ncdu
+    # (nixgl.wrap celluloid)
+    (nixgl.wrap cemu)
+    (nixgl.wrap obs-studio)
+    # (nixgl.wrap vlc)
+  ];
+
+  programs = {
+    mpv = enable {
+      config = {
+        script-opts = with lib.strings; concatStringsSep "," [
+          "ytdl_hook-ytdl_path=${lib.getExe pkgs.yt-dlp}"
+        ];
+        gpu-api = "opengl";
+        hwdec = "no";
+      };
+      package =
+        let
+          inhibit-gnome = import ./contrib/inhibit-gnome.nix {
+            inherit lib fetchFromGitHub;
+            inherit (pkgs) dbus mpv-unwrapped pkg-config stdenv;
+          };
+
+        in
+          nixgl.wrap (
+            pkgs.mpv.override {
+              scripts = [ inhibit-gnome ];
+            }
+          );
+    };
+  }
 
   xdg = {
     enable = true;

@@ -58,6 +58,7 @@
                 ];
                 extraSpecialArgs = {
                   inherit inputs outputs pkgs;
+                  nixVersion = "25.11";
                 };
               };
             };

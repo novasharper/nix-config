@@ -2,12 +2,12 @@
   pkgs,
   lib,
   fetchFromGitHub,
+  nixVersion ? "unstable",
   ...
 }:
 
 let
   stdenv = pkgs.stdenv;
-  nixgl = import ./nixgl-package.nix { inherit config pkgs lib; };
   enable = x: x // { enable = true; };
   username = "pllong";
   homedir = if stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
@@ -25,27 +25,6 @@ let
     ps.tox
     ps.virtualenv
   ]);
-
-  linuxPkgs = with pkgs; [
-    gimp
-    makemkv
-    mypaint
-    ncdu
-    # (nixgl.wrap celluloid)
-    (nixgl.wrap cemu)
-    (nixgl.wrap obs-studio)
-    # (nixgl.wrap vlc)
-  ];
-
-  darwinPkgs = with pkgs; [
-    ffmpeg
-    gnupg
-    # TODO: Broken
-    #keepassxc
-    libreoffice-bin
-    ncdu
-    wget
-  ];
 
   vscode-local = with pkgs; {
     Misode.vscode-nbt = vscode-utils.buildVscodeMarketplaceExtension {
@@ -72,64 +51,63 @@ in
     username = username;
     homeDirectory = homedir;
 
-    packages = with pkgs;
-      [
-        # === languages ===
-        # --- build ---
-        meson
-        ninja
-        # --- c++ ---
-        clang-tools
-        # --- go ---
-        golangci-lint
-        gotools
-        # --- python ---
-        pythonEnv
-        pipenv
-        # --- nix ---
-        nixpkgs-fmt
-        nixpkgs-lint
-        # --- rust-lang ---
-        # cargo
-        # cargo-binutils
-        # cargo-edit
-        # rustc
-        # rustfmt
-        # rust-analyzer
-        fenix.stable.completeToolchain
-        cargo-expand
+    packages = with pkgs; [
+      # === languages ===
+      # --- build ---
+      meson
+      ninja
+      # --- c++ ---
+      clang-tools
+      # --- go ---
+      golangci-lint
+      gotools
+      # --- python ---
+      pythonEnv
+      pipenv
+      # --- nix ---
+      nixpkgs-fmt
+      nixpkgs-lint
+      # --- rust-lang ---
+      # cargo
+      # cargo-binutils
+      # cargo-edit
+      # rustc
+      # rustfmt
+      # rust-analyzer
+      fenix.stable.completeToolchain
+      cargo-expand
 
-        # === general ===
-        bat
-        beancount # Text-based ledger
-        catt # Cast ALL the things
-        colordiff
-        exiv2
-        exiftool
-        qpdf
-        fava # BeanCount Web UI
-        fusee-interfacee-tk
-        gpxsee
-        htop
-        httpie
-        jq
-        kubernetes-helm
-        mosh
-        fastfetch
-        ripgrep
-        rsync
-        tmux
-        tree
-        # --- Art ---
-        #gimp
-        inkscape
-        # --- AV ---
-        # Disabling because I don't really seem to be using this
-        #pyradioWrapper
-        # --- fonts ---
-        office-code-pro
-      ] ++ lib.optionals stdenv.isLinux  linuxPkgs
-        ++ lib.optionals stdenv.isDarwin darwinPkgs;
+      # === general ===
+      bat
+      beancount # Text-based ledger
+      catt # Cast ALL the things
+      colordiff
+      exiv2
+      exiftool
+      qpdf
+      fava # BeanCount Web UI
+      fusee-interfacee-tk
+      gpxsee
+      htop
+      httpie
+      jq
+      kubernetes-helm
+      mosh
+      fastfetch
+      ripgrep
+      rsync
+      tmux
+      tree
+      # --- Art ---
+      #gimp
+      inkscape
+      # --- AV ---
+      # Disabling because I don't really seem to be using this
+      #pyradioWrapper
+      # --- fonts ---
+      office-code-pro
+    ];
+
     file = {
       ".local/bin/home-generations" = {
         executable = true;
@@ -148,6 +126,49 @@ in
           home-manager expire-generations "${"\${1:--7 days}"}"
           nix-store --gc
           nix-collect-garbage -d
+        '';
+      };
+      ".local/bin/update-channel" = {
+        executable = true;
+        text =
+          let
+            chPfx = if stdenv.isDarwin then "nixpkgs" else "nixos";
+            chSfx =
+              if (stdenv.isDarwin && nixVersion != "unstable")
+              then "-darwin"
+              else "";
+            nixCh = "${chPfx}-${nixVersion}${chSfx}";
+
+          in ''
+            #!/usr/bin/env bash
+            set -e
+
+            _nix_version="${nixVersion}"
+            if [[ $_nix_version == unstable ]] ; then
+              _home_mgr_channel=master.tar.gz
+            else
+              _home_mgr_channel=release-$_nix_version.tar.gz
+            fi
+            nix-channel --add https://nixos.org/channels/${nixCh} nixpkgs
+            nix-channel --add https://github.com/nix-community/home-manager/archive/$_home_mgr_channel home-manager
+            nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
+
+            echo "Updating channel"
+            nix-channel --update
+            echo "Installing latest nix"
+            nix-env -iA nixpkgs.nixVersions.latest
+          '';
+      };
+      ".local/bin/update-home" = {
+        executable = true;
+        text = ''
+          #!/usr/bin/env bash
+          set -e
+          nix flake update --flake ~/.config/home-manager
+          home-manager switch
+          if test -x update-desktop-database ; then
+            update-desktop-database
+          fi
         '';
       };
     };
@@ -221,7 +242,7 @@ in
   news.display = "silent";
 
   nix = {
-    package = pkgs.nix;
+    package = pkgs.nixVersions.latest;
 
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
@@ -248,40 +269,6 @@ in
 
 
     go.enable = true;
-
-    mpv = enable {
-      config = {
-        script-opts = with lib.strings; concatStringsSep "," [
-          "ytdl_hook-ytdl_path=${lib.getExe pkgs.yt-dlp}"
-        ];
-      } // (
-        # Vulkan API seems to be broken on Wayland
-        if stdenv.isLinux
-        then {
-          gpu-api = "opengl";
-          hwdec = "no";
-        }
-        else {}
-      );
-    } // (
-      if stdenv.isLinux
-      then {
-        package =
-          let
-            inhibit-gnome = import ./contrib/inhibit-gnome.nix {
-              inherit lib stdenv fetchFromGitHub;
-              inherit (pkgs) pkg-config dbus mpv-unwrapped;
-            };
-
-          in
-            nixgl.wrap (
-              pkgs.mpv.override {
-                scripts = [ inhibit-gnome ];
-              }
-            );
-      }
-      else {}
-    );
 
     tmux = enable {
       plugins = with pkgs.tmuxPlugins; [
