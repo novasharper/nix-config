@@ -15,7 +15,7 @@ esac
 
 if ! command -v nix-env &>/dev/null ; then
     echo "Installing NIX"
-    sh ./install-nix.sh --no-channel-add
+    sh ./install-nix.sh
     # Ensure that nix is loaded
     if [[ "$os" == "macos" ]] ; then
         source /nix/var/nix/profiles/default/etc/profile.d/nix.sh
@@ -23,18 +23,6 @@ if ! command -v nix-env &>/dev/null ; then
         source $HOME/.nix-profile/etc/profile.d/nix.sh
     fi
 fi
-
-NIXPKGS_VERSION=$(cat $CURRENT_DIR/nixpkgs/VERSION)
-if [[ "$os" == "macos" ]] ; then
-    NIXPKGS_CHANNEL=nixpkgs-$NIXPKGS_VERSION-darwin
-else
-    NIXPKGS_CHANNEL=nixos-$NIXPKGS_VERSION
-fi
-echo "Configuring nix to use the $NIXPKGS_VERSION channel"
-nix-channel --add https://nixos.org/channels/$NIXPKGS_CHANNEL nixpkgs
-nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
-nix-channel --add https://github.com/nix-community/home-manager/archive/release-$NIXPKGS_VERSION.tar.gz home-manager
-nix-channel --update
 
 if [[ ! -d ~/.config ]] ; then
     echo "Creating XDG_CONFIG_DIR"
@@ -51,7 +39,12 @@ if [[ ! -d ~/.config/home-manager ]] ; then
     ln -s $CURRENT_DIR/home-manager ~/.config
 fi
 
-echo "Initializing/updating user environment"
-NIX_PATH="$HOME/.nix-defexpr/channels:$HOME/.local/state/nix/profiles/channels:/nix/var/nix/profiles/per-user/$USER/channels${NIX_PATH:+:$NIX_PATH}"
-export NIX_PATH
-nix-shell '<home-manager>' -A install
+if ! command -v home-manager &>/dev/null ; then
+    echo "Initializing user environment"
+    NIX_PATH="$HOME/.nix-defexpr/channels:$HOME/.local/state/nix/profiles/channels:/nix/var/nix/profiles/per-user/$USER/channels${NIX_PATH:+:$NIX_PATH}"
+    export NIX_PATH
+    nix --experimental-features 'nix-command flakes' run home-manager/master -- switch
+else
+    echo "Updating user environment"
+    home-manager switch
+fi
