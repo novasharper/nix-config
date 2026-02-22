@@ -1,10 +1,10 @@
-{ inputs,
-  config,
-  pkgs,
-  lib,
-  fetchFromGitHub,
-  nixVersion ? "unstable",
-  ...
+{ inputs
+, config
+, pkgs
+, lib
+, fetchFromGitHub
+, nixVersion ? "unstable"
+, ...
 }:
 
 let
@@ -67,7 +67,6 @@ in
       pipenv
       # --- nix ---
       nixpkgs-fmt
-      nixpkgs-lint
       # --- rust-lang ---
       # cargo
       # cargo-binutils
@@ -140,7 +139,8 @@ in
               else "";
             nixCh = "${chPfx}-${nixVersion}${chSfx}";
 
-          in ''
+          in
+          ''
             #!/usr/bin/env bash
             set -e
 
@@ -240,18 +240,21 @@ in
     registry =
       let
         items = [ "nixpkgs" "home-manager" "fenix" "nixgl" ];
-        entries = map (item: {
-          name = item;
-          value = {
-            from = {
-              type = "indirect";
-              id = item;
+        entries = map
+          (item: {
+            name = item;
+            value = {
+              from = {
+                type = "indirect";
+                id = item;
+              };
+              flake = inputs.${item};
             };
-            flake = inputs.${item};
-          };
-        }) items;
+          })
+          items;
 
-      in builtins.listToAttrs entries;
+      in
+      builtins.listToAttrs entries;
 
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
@@ -263,7 +266,7 @@ in
     home-manager.enable = true;
 
     # TODO: Figure out which settings to use
-    gemini-cli = enable {};
+    gemini-cli = enable { };
 
     gh = enable {
       settings = {
@@ -353,6 +356,6 @@ in
     ./shells.nix
     ./vim.nix
   ] ++ lib.optional (builtins.pathExists localConf) localConf
-    ++ lib.optional stdenv.isLinux  ./linux.nix
-    ++ lib.optional stdenv.isDarwin ./darwin.nix;
+  ++ lib.optional stdenv.isLinux ./linux.nix
+  ++ lib.optional stdenv.isDarwin ./darwin.nix;
 }

@@ -31,7 +31,7 @@ in
     (final: prev: {
       inetutils = prev.inetutils.overrideAttrs (
         old: {
-          env = (old.env or {}) // {
+          env = (old.env or { }) // {
             NIX_CFLAGS_COMPILE = toString [
               (old.env.NIX_CFLAGS_COMPILE or "")
               "-Wno-format-security"

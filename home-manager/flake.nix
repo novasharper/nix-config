@@ -20,45 +20,45 @@
   };
 
   outputs =
-    inputs@{
-      self,
-      nixpkgs,
-      flake-utils,
-      home-manager,
-      ...
+    inputs@{ self
+    , nixpkgs
+    , flake-utils
+    , home-manager
+    , ...
     }:
     let
       inherit (self) outputs;
-    
+
     in
-      flake-utils.lib.eachDefaultSystem (system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            config = {
-              allowUnfree = true;
-              allowUnfreePredicate = (_: true);
-            };
-            overlays = [
-              inputs.fenix.overlays.default
-              inputs.nixgl.overlay
+    flake-utils.lib.eachDefaultSystem (system:
+    let
+      pkgs = import nixpkgs {
+        inherit system;
+        config = {
+          allowUnfree = true;
+          allowUnfreePredicate = (_: true);
+        };
+        overlays = [
+          inputs.fenix.overlays.default
+          inputs.nixgl.overlay
+        ];
+      };
+    in
+    {
+      legacyPackages = {
+        homeConfigurations = {
+          pllong = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              ./home.nix
             ];
-          };
-        in {
-          legacyPackages = {
-            homeConfigurations = {
-              pllong = home-manager.lib.homeManagerConfiguration {
-                inherit pkgs;
-                modules = [
-                  ./home.nix
-                ];
-                extraSpecialArgs = {
-                  inherit inputs outputs pkgs;
-                  nixVersion = "25.11";
-                };
-              };
+            extraSpecialArgs = {
+              inherit inputs outputs pkgs;
+              nixVersion = "25.11";
             };
           };
-        }
-      );
+        };
+      };
+    }
+    );
 }

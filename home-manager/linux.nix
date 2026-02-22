@@ -1,9 +1,9 @@
-{ config,
-  pkgs,
-  lib,
-  fetchFromGitHub,
-  nixVersion,
-  ...
+{ config
+, pkgs
+, lib
+, fetchFromGitHub
+, nixVersion
+, ...
 }:
 
 let
@@ -25,30 +25,31 @@ in
     # (nixgl.wrap vlc)
   ];
 
-  programs = {
-    mpv = enable {
-      config = {
-        script-opts = with lib.strings; concatStringsSep "," [
-          "ytdl_hook-ytdl_path=${lib.getExe pkgs.yt-dlp}"
-        ];
-        gpu-api = "opengl";
-        hwdec = "no";
-      };
-      package =
-        let
-          inhibit-gnome = import ./contrib/inhibit-gnome.nix {
-            inherit lib fetchFromGitHub;
-            inherit (pkgs) dbus mpv-unwrapped pkg-config stdenv;
-          };
+  programs =
+    {
+      mpv = enable {
+        config = {
+          script-opts = with lib.strings; concatStringsSep "," [
+            "ytdl_hook-ytdl_path=${lib.getExe pkgs.yt-dlp}"
+          ];
+          gpu-api = "opengl";
+          hwdec = "no";
+        };
+        package =
+          let
+            inhibit-gnome = import ./contrib/inhibit-gnome.nix {
+              inherit lib fetchFromGitHub;
+              inherit (pkgs) dbus mpv-unwrapped pkg-config stdenv;
+            };
 
-        in
+          in
           nixgl.wrap (
             pkgs.mpv.override {
               scripts = [ inhibit-gnome ];
             }
           );
+      };
     };
-  }
 
   xdg = {
     enable = true;
