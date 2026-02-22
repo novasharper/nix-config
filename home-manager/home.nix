@@ -1,4 +1,5 @@
-{ config,
+{ inputs,
+  config,
   pkgs,
   lib,
   fetchFromGitHub,
@@ -150,13 +151,9 @@ in
               _home_mgr_channel=release-$_nix_version.tar.gz
             fi
             nix-channel --add https://nixos.org/channels/${nixCh} nixpkgs
-            nix-channel --add https://github.com/nix-community/home-manager/archive/$_home_mgr_channel home-manager
-            nix-channel --add https://github.com/nix-community/fenix/archive/main.tar.gz fenix
 
             echo "Updating channel"
             nix-channel --update
-            echo "Installing latest nix"
-            nix-env -iA nixpkgs.nixVersions.latest
           '';
       };
       ".local/bin/update-home" = {
@@ -165,6 +162,7 @@ in
           #!/usr/bin/env bash
           set -e
           nix flake update --flake ~/.config/home-manager
+          nix upgrade-nix
           home-manager switch
           if test -x update-desktop-database ; then
             update-desktop-database
@@ -179,26 +177,16 @@ in
       "$HOME/.nix-profile/bin"
       "/nix/var/nix/profiles/default/bin"
     ];
-    sessionVariables =
-      let
-        rootChannelDir = "/nix/var/nix/profiles/per-user/root/channels";
-        globalChannelDir = "/nix/var/nix/profiles/per-user/${username}/channels";
-        localChannelDir = "${homedir}/.local/state/nix/profiles/channels";
-      in with lib.strings; {
-        NIX_PATH = concatStringsSep ":" (
-          [ "$HOME/.nix-defexpr/channels" ]
-          ++ lib.optional (builtins.pathExists rootChannelDir) rootChannelDir
-          ++ lib.optional (builtins.pathExists globalChannelDir) globalChannelDir
-          ++ lib.optional (builtins.pathExists localChannelDir) localChannelDir
-        );
-        EDITOR = "${lib.getExe pkgs.vim}";
-      };
+    sessionVariables = {
+      EDITOR = "${lib.getExe pkgs.vim}";
+    };
     shellAliases = {
       e = "\${EDITOR:-emacs -nw}";
       code = "codium";
       "rm~" = "find . -type f -name \\*~ -delete";
       rmTilda = "find . -type f -name \\*~ -delete";
-      path = "echo -e \${PATH//:\\\\n}";
+      path = "echo -e $PATH | sed 's/:/\\n/g'";
+      nix-path = "echo -e $NIX_PATH | sed 's/:/\\n/g'";
       rsync-progress = "rsync -azp --info=progress2";
       ls = "ls --color=auto";
       l = "ls -lAh";
@@ -243,6 +231,27 @@ in
 
   nix = {
     package = pkgs.nixVersions.latest;
+
+    channels = {
+      inherit (inputs) nixpkgs home-manager fenix nixgl;
+    };
+    keepOldNixPath = false;
+
+    registry =
+      let
+        items = [ "nixpkgs" "home-manager" "fenix" "nixgl" ];
+        entries = map (item: {
+          name = item;
+          value = {
+            from = {
+              type = "indirect";
+              id = item;
+            };
+            flake = inputs.${item};
+          };
+        }) items;
+
+      in builtins.listToAttrs entries;
 
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
