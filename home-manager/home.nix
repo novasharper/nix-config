@@ -273,7 +273,16 @@ in
     tmux = enable {
       plugins = with pkgs.tmuxPlugins; [
         pain-control
-        prefix-highlight
+        {
+          plugin = prefix-highlight;
+          # This is needed so that the config is defined _before_ the plugin
+          # is enabled.
+          extraConfig = ''
+            # Right Status
+            set -g status-right ' #{prefix_highlight} %A %m/%d | %H:%M '
+            set -g status-right-length 60
+          '';
+        }
       ];
       shell = "${pkgs.zsh}/bin/zsh";
       shortcut = "a";
@@ -282,10 +291,6 @@ in
         # Left Status
         set -g status-left '[ #h:#S ] '
         set -g status-left-length 30
-
-        # Right Status
-        set -g status-right ' #{prefix_highlight} %A %m/%d | %H:%M '
-        set -g status-right-length 60
 
         # Window title options
         set-window-option -g window-status-style bright
