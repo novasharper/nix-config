@@ -55,6 +55,7 @@ in
     packages = with pkgs; [
       # === languages ===
       # --- build ---
+      cmake
       meson
       ninja
       # --- c++ ---
