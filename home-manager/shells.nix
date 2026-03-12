@@ -13,21 +13,22 @@ in
 {
   programs = {
     zsh = enable {
+      dotDir = "${config.xdg.configHome}/zsh";
       enableCompletion = true;
-      syntaxHighlighting.enable = true;
       enableVteIntegration = true;
       historySubstringSearch.enable = true;
+      initContent = lib.mkOrder 1000 shellCommon.initExtra;
       oh-my-zsh = {
         enable = true;
         theme = "ys";
       };
       profileExtra = profileExtra;
-      initContent = lib.mkOrder 1000 shellCommon.initExtra;
+      syntaxHighlighting.enable = true;
     };
 
     bash = enable {
-      enableVteIntegration = true;
       bashrcExtra = profileExtra;
+      enableVteIntegration = true;
       initExtra = ''
         if [ -f /etc/bashrc ] ; then
           . /etc/bashrc
