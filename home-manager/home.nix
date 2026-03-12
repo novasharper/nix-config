@@ -66,6 +66,7 @@ in
       pythonEnv
       pipenv
       # --- nix ---
+      hydra-check
       nixpkgs-fmt
       # --- rust-lang ---
       # cargo

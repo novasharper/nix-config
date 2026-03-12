@@ -20,7 +20,8 @@
   };
 
   outputs =
-    inputs@{ self
+    inputs@{
+      self
     , nixpkgs
     , flake-utils
     , home-manager
@@ -32,8 +33,14 @@
       disableNodejsTesting =
         final: prev:
         {
-          nodejs_22 = prev.nodejs_22.overrideAttrs { doCheck = false; };
-          nodejs-slim_22 = prev.nodejs-slim_22.overrideAttrs { doCheck = false; };
+          nodejs_22 =
+            if prev.stdenv.isDarwin
+            then prev.nodejs_22.overrideAttrs { doCheck = false; }
+            else prev.nodejs_22;
+          nodejs-slim_22 =
+            if prev.stdenv.isDarwin
+            then prev.nodejs-slim_22.overrideAttrs { doCheck = false; }
+            else prev.nodejs-slim_22;
         };
 
     in
@@ -61,7 +68,7 @@
                 ./home.nix
               ];
               extraSpecialArgs = {
-                inherit inputs outputs pkgs;
+                inherit inputs self outputs pkgs;
                 nixVersion = "unstable";
               };
             };
