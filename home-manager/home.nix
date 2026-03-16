@@ -83,9 +83,9 @@ in
       beancount # Text-based ledger
       catt # Cast ALL the things
       colordiff
-      exiv2
       exiftool
-      qpdf
+      exiv2
+      fastfetch
       fava # BeanCount Web UI
       fusee-interfacee-tk
       gpxsee
@@ -94,11 +94,14 @@ in
       jq
       kubernetes-helm
       mosh
-      fastfetch
+      qpdf
       ripgrep
       rsync
       tmux
       tree
+      # --- Raspberry Pi Pico ---
+      pico-sdk
+      probe-rs-tools
       # --- Art ---
       #gimp
       inkscape
