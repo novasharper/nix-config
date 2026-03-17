@@ -26,25 +26,6 @@ let
     ps.virtualenv
   ]);
 
-  vscode-local = with pkgs; {
-    Misode.vscode-nbt = vscode-utils.buildVscodeMarketplaceExtension {
-      mktplcRef = {
-        name = "vscode-nbt";
-        publisher = "Misodee";
-        version = "0.9.1";
-        sha256 = "6hl3TQLTjJwpF/oV+syVvxVxCNFKawBci3loyKiVJTY=";
-      };
-    };
-    Lencerf.beancount = vscode-utils.buildVscodeMarketplaceExtension {
-      mktplcRef = {
-        name = "beancount";
-        publisher = "Lencerf";
-        version = "0.10.0";
-        sha256 = "xsGYr9Aqfoe16U9lACyGkTfknwMf0n2oOog498SS26Y=";
-      };
-    };
-  };
-
 in
 {
   home = {
@@ -321,19 +302,20 @@ in
     vscode = enable {
       package = pkgs.vscodium;
       profiles.default = {
-        extensions = with pkgs.vscode-extensions; [
+        extensions = with pkgs.nix-vscode-extensions.vscode-marketplace; [
           bbenoist.nix
           golang.go
+          lencerf.beancount
+          misodee.vscode-nbt
           ms-python.python
           ms-python.vscode-pylance
           ms-vscode-remote.remote-containers
           ms-vscode-remote.remote-ssh
+          raspberry-pi.raspberry-pi-pico
           redhat.java
           redhat.vscode-yaml
           rust-lang.rust-analyzer
           tamasfe.even-better-toml
-          vscode-local.Lencerf.beancount
-          vscode-local.Misode.vscode-nbt
         ];
         enableExtensionUpdateCheck = false;
         enableUpdateCheck = false;

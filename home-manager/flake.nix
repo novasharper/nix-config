@@ -9,6 +9,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -55,6 +59,7 @@
           overlays = [
             inputs.fenix.overlays.default
             inputs.nixgl.overlay
+            inputs.nix-vscode-extensions.overlays.default
             disableNodejsTesting
           ];
         };
