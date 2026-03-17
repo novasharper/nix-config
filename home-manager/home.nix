@@ -317,13 +317,13 @@ in
           tamasfe.even-better-toml
           # Raspberry Pi Pico
           # Disabling until supports system toolchain
-          # raspberry-pi.raspberry-pi-pico
-          # paulober.pico-w-go
-          # marus25.cortex-debug
-          # mcu-debug.debug-tracker-vscode
-          # mcu-debug.memory-view
-          # mcu-debug.rtos-views
-          # mcu-debug.peripheral-viewer
+          raspberry-pi.raspberry-pi-pico
+          paulober.pico-w-go
+          marus25.cortex-debug
+          mcu-debug.debug-tracker-vscode
+          mcu-debug.memory-view
+          mcu-debug.rtos-views
+          mcu-debug.peripheral-viewer
         ];
         enableExtensionUpdateCheck = false;
         enableUpdateCheck = false;
