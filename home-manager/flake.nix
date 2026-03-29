@@ -60,7 +60,7 @@
             inputs.fenix.overlays.default
             inputs.nixgl.overlay
             inputs.nix-vscode-extensions.overlays.default
-            disableNodejsTesting
+            # disableNodejsTesting
           ];
         };
       in
