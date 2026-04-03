@@ -19,7 +19,7 @@ let
     propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
   });
 
-  pythonEnv = pkgs.python312.withPackages (ps: [
+  pythonEnv = pkgs.python314.withPackages (ps: [
     ps.pylint
     ps.setuptools
     ps.tox
