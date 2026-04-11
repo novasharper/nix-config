@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "contrib": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "contrib",
+        "type": "path"
+      },
+      "original": {
+        "path": "contrib",
+        "type": "path"
+      },
+      "parent": []
+    },
     "fenix": {
       "inputs": {
         "nixpkgs": [
@@ -136,6 +152,7 @@
     },
     "root": {
       "inputs": {
+        "contrib": "contrib",
         "fenix": "fenix",
         "flake-utils": "flake-utils",
         "home-manager": "home-manager",

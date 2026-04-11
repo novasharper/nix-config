@@ -31,6 +31,18 @@ let
 
 in
 {
+  imports = [
+    ./git.nix
+    ./shells.nix
+    ./vim.nix
+  ]
+  ++ lib.optional (builtins.pathExists localConf) localConf
+  ++ lib.optional stdenv.isLinux ./linux.nix
+  ++ lib.optionals stdenv.isDarwin [
+    ./darwin.nix
+    ./claude.nix
+  ];
+
   home = {
     username = username;
     homeDirectory = homedir;
@@ -215,7 +227,7 @@ in
   news.display = "silent";
 
   nix = {
-    package = pkgs.nixVersions.latest;
+    package = pkgs.nix;
 
     channels = {
       inherit (inputs)
@@ -355,15 +367,11 @@ in
     };
   };
 
-  imports = [
-    ./git.nix
-    ./shells.nix
-    ./vim.nix
-  ]
-  ++ lib.optional (builtins.pathExists localConf) localConf
-  ++ lib.optional stdenv.isLinux ./linux.nix
-  ++ lib.optionals stdenv.isDarwin [
-    ./darwin.nix
-    ./claude.nix
-  ];
+  xdg = {
+    configFile = {
+      "nixpkgs/config.nix" = {
+        source = ./nixpkgs-config.nix;
+      };
+    };
+  };
 }

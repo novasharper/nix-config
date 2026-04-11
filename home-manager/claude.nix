@@ -10,6 +10,14 @@
 
   programs.claude-code = {
     enable = true;
+    package = pkgs.mkAgentWrapper {
+      pkg = pkgs.claude-code;
+      name = "claude";
+      env = {
+        CLAUDE_CODE_ATTRIBUTION_HEADER = 0;
+        CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1;
+      };
+    };
     commands = {
       session-info = ''
         ---
@@ -29,6 +37,10 @@
         disableBypassPermissionsMode = "disable";
       };
       includeCoAuthoredBy = false;
+      attribution = {
+        commit = "";
+        pr = "";
+      };
       statusLine = {
         type = "command";
         command = ./contrib/claude-session-info.py;

@@ -21,69 +21,59 @@
       url = "github:nix-community/nixgl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    contrib = {
+      url = ./contrib;
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    inputs@{
-      self,
-      nixpkgs,
-      flake-utils,
-      home-manager,
-      ...
-    }:
+    { self
+    , nixpkgs
+    , flake-utils
+    , home-manager
+    , ...
+    }@inputs:
     let
       inherit (self) outputs;
-      # Temp measure until cache for it is built
-      disableNodejsTesting = final: prev: {
-        nodejs_22 =
-          if prev.stdenv.isDarwin then prev.nodejs_22.overrideAttrs { doCheck = false; } else prev.nodejs_22;
-        nodejs-slim_22 =
-          if prev.stdenv.isDarwin then
-            prev.nodejs-slim_22.overrideAttrs { doCheck = false; }
-          else
-            prev.nodejs-slim_22;
-      };
 
     in
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          config = {
-            allowUnfree = true;
-            allowUnfreePredicate = (_: true);
+      flake-utils.lib.eachDefaultSystem (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            config = import ./nixpkgs-config.nix;
+            overlays = [
+              inputs.fenix.overlays.default
+              inputs.nixgl.overlay
+              inputs.nix-vscode-extensions.overlays.default
+              inputs.contrib.overlays.default
+            ];
           };
-          overlays = [
-            inputs.fenix.overlays.default
-            inputs.nixgl.overlay
-            inputs.nix-vscode-extensions.overlays.default
-            # disableNodejsTesting
-          ];
-        };
-      in
-      {
-        formatter = pkgs.nixfmt-tree;
+        in
+        {
+          formatter = pkgs.nixfmt-tree;
 
-        legacyPackages = {
-          homeConfigurations = {
-            pllong = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
-              modules = [
-                ./home.nix
-              ];
-              extraSpecialArgs = {
-                inherit
-                  inputs
-                  self
-                  outputs
-                  pkgs
-                  ;
-                nixVersion = "unstable";
+          legacyPackages = {
+            homeConfigurations = {
+              pllong = home-manager.lib.homeManagerConfiguration {
+                inherit pkgs;
+                modules = [
+                  ./home.nix
+                ];
+                extraSpecialArgs = {
+                  inherit
+                    inputs
+                    self
+                    outputs
+                    pkgs
+                    ;
+                  nixVersion = "unstable";
+                };
               };
             };
           };
-        };
-      }
-    );
+        }
+      );
 }
