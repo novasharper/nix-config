@@ -362,5 +362,8 @@ in
   ]
   ++ lib.optional (builtins.pathExists localConf) localConf
   ++ lib.optional stdenv.isLinux ./linux.nix
-  ++ lib.optional stdenv.isDarwin ./darwin.nix;
+  ++ lib.optionals stdenv.isDarwin [
+    ./darwin.nix
+    ./claude.nix
+  ];
 }
