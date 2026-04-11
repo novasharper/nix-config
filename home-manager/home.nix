@@ -1,9 +1,10 @@
-{ inputs
-, config
-, pkgs
-, lib
-, nixVersion ? "unstable"
-, ...
+{
+  inputs,
+  config,
+  pkgs,
+  lib,
+  nixVersion ? "unstable",
+  ...
 }:
 
 let
@@ -15,9 +16,11 @@ let
   localConf = "${confdir}/nix-local/default.nix";
 
   # package wrappers
-  pyradioWrapper = pkgs.pyradio.overrideAttrs (self: super: {
-    propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
-  });
+  pyradioWrapper = pkgs.pyradio.overrideAttrs (
+    self: super: {
+      propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
+    }
+  );
 
   pythonEnv = pkgs.python314.withPackages (ps: [
     ps.pylint
@@ -118,10 +121,7 @@ in
         text =
           let
             chPfx = if stdenv.isDarwin then "nixpkgs" else "nixos";
-            chSfx =
-              if (stdenv.isDarwin && nixVersion != "unstable")
-              then "-darwin"
-              else "";
+            chSfx = if (stdenv.isDarwin && nixVersion != "unstable") then "-darwin" else "";
             nixCh = "${chPfx}-${nixVersion}${chSfx}";
 
           in
@@ -218,31 +218,42 @@ in
     package = pkgs.nixVersions.latest;
 
     channels = {
-      inherit (inputs) nixpkgs home-manager fenix nixgl;
+      inherit (inputs)
+        nixpkgs
+        home-manager
+        fenix
+        nixgl
+        ;
     };
     keepOldNixPath = false;
 
     registry =
       let
-        items = [ "nixpkgs" "home-manager" "fenix" "nixgl" ];
-        entries = map
-          (item: {
-            name = item;
-            value = {
-              from = {
-                type = "indirect";
-                id = item;
-              };
-              flake = inputs.${item};
+        items = [
+          "nixpkgs"
+          "home-manager"
+          "fenix"
+          "nixgl"
+        ];
+        entries = map (item: {
+          name = item;
+          value = {
+            from = {
+              type = "indirect";
+              id = item;
             };
-          })
-          items;
+            flake = inputs.${item};
+          };
+        }) items;
 
       in
       builtins.listToAttrs entries;
 
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
   };
 
@@ -263,7 +274,6 @@ in
         };
       };
     };
-
 
     go.enable = true;
 
@@ -349,7 +359,8 @@ in
     ./git.nix
     ./shells.nix
     ./vim.nix
-  ] ++ lib.optional (builtins.pathExists localConf) localConf
+  ]
+  ++ lib.optional (builtins.pathExists localConf) localConf
   ++ lib.optional stdenv.isLinux ./linux.nix
   ++ lib.optional stdenv.isDarwin ./darwin.nix;
 }
