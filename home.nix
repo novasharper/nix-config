@@ -325,6 +325,7 @@ in
       package = pkgs.vscodium;
       profiles.default = {
         extensions = with pkgs.nix-vscode-extensions.vscode-marketplace; [
+          anthropic.claude-code
           bbenoist.nix
           golang.go
           lencerf.beancount
@@ -350,10 +351,12 @@ in
         enableExtensionUpdateCheck = false;
         enableUpdateCheck = false;
         userSettings = {
+          "[nix]"."editor.tabSize" = 2;
           "dev.containers.dockerPath" = "podman";
           "extensions.autoUpdate" = false;
           "files.autoSave" = "off";
-          "[nix]"."editor.tabSize" = 2;
+          "window.autoDetectColorScheme" = true;
+          "claudeCode.preferredLocation" = "panel";
         };
       };
       mutableExtensionsDir = false;
