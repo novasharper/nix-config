@@ -376,6 +376,7 @@ in
           "files.autoSave" = "off";
           "window.autoDetectColorScheme" = true;
           "claudeCode.preferredLocation" = "panel";
+          "redhat.telemetry.enabled" = false;
         };
       };
       mutableExtensionsDir = false;
