@@ -244,6 +244,68 @@ in
       };
     };
 
+    ghostty = enable {
+      package =
+        if stdenv.isDarwin
+        then pkgs.ghostty-bin
+        else pkgs.ghostty;
+      settings = {
+        theme = "light:Catppuccin Latte,dark:Catppuccin Mocha";
+        background-opacity = 0.95;
+        background-blur = 10;
+        window-padding-x = 16;
+        window-padding-y = 16;
+        window-padding-balance = true; # centers text when window doesn't match cell grid
+        window-padding-color = "background";
+        scrollback-limit = 100000000; # ~100mb per terminal
+        scrollbar = "system"; # default - follows GTK system settings
+        shell-integration = "detect";
+        shell-integration-features = "cursor,sudo,title";
+        quit-after-last-window-closed = true;
+        keybind = [
+          "ctrl+shift+up=jump_to_prompt:-1" # previous prompt
+          "ctrl+shift+down=jump_to_prompt:1" # next prompt
+
+          # create splits
+          "ctrl+shift+enter=new_split:right"
+          "ctrl+shift+d=new_split:down"
+          
+          # navigate with vim keys (ctrl+shift+k removed to avoid conflict with clear_screen)
+          "ctrl+shift+h=goto_split:left"
+          "ctrl+shift+j=goto_split:bottom"
+          "ctrl+shift+l=goto_split:right"
+          # Note: Use Alt+Up for top split navigation instead
+          
+          # or arrow keys
+          "alt+left=goto_split:left"
+          "alt+right=goto_split:right"
+          "alt+up=goto_split:top"
+          "alt+down=goto_split:bottom"
+          
+          # split management
+          "ctrl+shift+z=toggle_split_zoom" # maximize current split
+          "ctrl+shift+equal=equalize_splits" # balance split sizes
+
+          # tab creation/navigation
+          "ctrl+shift+t=new_tab"
+          "ctrl+tab=next_tab"
+          "ctrl+shift+tab=previous_tab"
+          
+          # Note: Ctrl+1-9 bindings removed to preserve standard terminal behavior
+          # Use Ctrl+Tab/Ctrl+Shift+Tab for tab navigation instead
+          
+          # tab movement
+          "ctrl+shift+alt+left=move_tab:-1"
+          "ctrl+shift+alt+right=move_tab:1"
+
+          # font size adjustment
+          "ctrl+plus=increase_font_size:1"
+          "ctrl+minus=decrease_font_size:1"
+          "ctrl+0=reset_font_size"
+        ];
+      };
+    };
+
     go.enable = true;
 
     tmux = enable {
