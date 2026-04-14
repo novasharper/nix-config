@@ -61,6 +61,7 @@ in
       # --- python ---
       pythonEnv
       pipenv
+      poetry
       # --- nix ---
       hydra-check
       nixpkgs-fmt
