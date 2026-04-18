@@ -28,52 +28,53 @@
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , flake-utils
-    , home-manager
-    , ...
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      home-manager,
+      ...
     }@inputs:
     let
       inherit (self) outputs;
 
     in
-      flake-utils.lib.eachDefaultSystem (
-        system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            config = import ./nixpkgs-config.nix;
-            overlays = [
-              inputs.fenix.overlays.default
-              inputs.nixgl.overlay
-              inputs.nix-vscode-extensions.overlays.default
-              inputs.contrib.overlays.default
-            ];
-          };
-        in
-        {
-          formatter = pkgs.nixfmt-tree;
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          config = import ./nixpkgs-config.nix;
+          overlays = [
+            inputs.fenix.overlays.default
+            inputs.nixgl.overlay
+            inputs.nix-vscode-extensions.overlays.default
+            inputs.contrib.overlays.default
+          ];
+        };
+      in
+      {
+        formatter = pkgs.nixfmt-tree;
 
-          legacyPackages = {
-            homeConfigurations = {
-              pllong = home-manager.lib.homeManagerConfiguration {
-                inherit pkgs;
-                modules = [
-                  ./home.nix
-                ];
-                extraSpecialArgs = {
-                  inherit
-                    inputs
-                    self
-                    outputs
-                    pkgs
-                    ;
-                  nixVersion = "unstable";
-                };
+        legacyPackages = {
+          homeConfigurations = {
+            pllong = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [
+                ./home.nix
+              ];
+              extraSpecialArgs = {
+                inherit
+                  inputs
+                  self
+                  outputs
+                  pkgs
+                  ;
+                nixVersion = "unstable";
               };
             };
           };
-        }
-      );
+        };
+      }
+    );
 }

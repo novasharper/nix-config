@@ -246,10 +246,7 @@ in
     };
 
     ghostty = enable {
-      package =
-        if stdenv.isDarwin
-        then pkgs.ghostty-bin
-        else pkgs.ghostty;
+      package = if stdenv.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
       settings = {
         theme = "light:Catppuccin Latte,dark:Catppuccin Mocha";
         background-opacity = 0.95;
@@ -270,19 +267,19 @@ in
           # create splits
           "ctrl+shift+enter=new_split:right"
           "ctrl+shift+d=new_split:down"
-          
+
           # navigate with vim keys (ctrl+shift+k removed to avoid conflict with clear_screen)
           "ctrl+shift+h=goto_split:left"
           "ctrl+shift+j=goto_split:bottom"
           "ctrl+shift+l=goto_split:right"
           # Note: Use Alt+Up for top split navigation instead
-          
+
           # or arrow keys
           "alt+left=goto_split:left"
           "alt+right=goto_split:right"
           "alt+up=goto_split:top"
           "alt+down=goto_split:bottom"
-          
+
           # split management
           "ctrl+shift+z=toggle_split_zoom" # maximize current split
           "ctrl+shift+equal=equalize_splits" # balance split sizes
@@ -291,10 +288,10 @@ in
           "ctrl+shift+t=new_tab"
           "ctrl+tab=next_tab"
           "ctrl+shift+tab=previous_tab"
-          
+
           # Note: Ctrl+1-9 bindings removed to preserve standard terminal behavior
           # Use Ctrl+Tab/Ctrl+Shift+Tab for tab navigation instead
-          
+
           # tab movement
           "ctrl+shift+alt+left=move_tab:-1"
           "ctrl+shift+alt+right=move_tab:1"
