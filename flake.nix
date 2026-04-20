@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -46,6 +51,7 @@
           inherit system;
           config = import ./nixpkgs-config.nix;
           overlays = [
+            inputs.claude-code.overlays.default
             inputs.fenix.overlays.default
             inputs.nixgl.overlay
             inputs.nix-vscode-extensions.overlays.default
