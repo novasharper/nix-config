@@ -29,6 +29,7 @@
     };
     settings = {
       autoMemoryEnabled = true;
+      model = "opusplan";
       sandbox = {
         enabled = true;
       };
