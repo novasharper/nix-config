@@ -90,7 +90,7 @@ in
       httpie
       jq
       kubernetes-helm
-      lima
+      lima-full
       mosh
       qpdf
       ripgrep
