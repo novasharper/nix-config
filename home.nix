@@ -41,6 +41,7 @@ in
   ++ lib.optionals stdenv.isDarwin [
     ./darwin.nix
     ./claude.nix
+    ./codex.nix
   ];
 
   home = {
