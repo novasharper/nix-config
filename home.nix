@@ -340,7 +340,6 @@ in
     };
 
     vscode = enable {
-      package = pkgs.vscodium;
       profiles.default = {
         extensions = with pkgs.nix-vscode-extensions.vscode-marketplace; [
           anthropic.claude-code

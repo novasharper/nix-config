@@ -23,7 +23,6 @@ in
     };
     shellAliases = {
       e = "\${EDITOR:-emacs -nw}";
-      code = "codium";
       "rm~" = "find . -type f -name \\*~ -delete";
       rmTilda = "find . -type f -name \\*~ -delete";
       path = "echo -e $PATH | sed 's/:/\\n/g'";
