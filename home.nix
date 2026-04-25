@@ -127,8 +127,8 @@ in
           #!nix-shell <home-manager> -i bash -p home-manager
           set -e
           home-manager expire-generations "${"\${1:--7 days}"}"
+          nix-env --delete-generations old
           nix-store --gc
-          nix-collect-garbage -d
         '';
       };
       ".local/bin/update-channel" = {
