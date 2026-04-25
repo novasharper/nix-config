@@ -23,6 +23,29 @@
         "type": "github"
       }
     },
+    "codex-cli": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1777054843,
+        "narHash": "sha256-aiuiKK6xJu5inj/RTmSl9S3jDC6RzNsKfNJ700MRPNY=",
+        "owner": "sadjow",
+        "repo": "codex-cli-nix",
+        "rev": "fc382bef14dcb9873769bdcb4d3b943ef2606489",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sadjow",
+        "repo": "codex-cli-nix",
+        "type": "github"
+      }
+    },
     "contrib": {
       "inputs": {
         "nixpkgs": [
@@ -176,6 +199,7 @@
     "root": {
       "inputs": {
         "claude-code": "claude-code",
+        "codex-cli": "codex-cli",
         "contrib": "contrib",
         "fenix": "fenix",
         "flake-utils": "flake-utils",

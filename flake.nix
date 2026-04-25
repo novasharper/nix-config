@@ -4,8 +4,15 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+
+    # Coding Agents
     claude-code = {
       url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+    codex-cli = {
+      url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -52,6 +59,7 @@
           config = import ./nixpkgs-config.nix;
           overlays = [
             inputs.claude-code.overlays.default
+            inputs.codex-cli.overlays.default
             inputs.fenix.overlays.default
             inputs.nixgl.overlay
             inputs.nix-vscode-extensions.overlays.default
