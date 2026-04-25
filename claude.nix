@@ -29,7 +29,7 @@
     };
     settings = {
       autoMemoryEnabled = true;
-      model = "opusplan";
+      model = "sonnet";
       sandbox = {
         enabled = true;
       };
