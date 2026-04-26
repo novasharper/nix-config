@@ -7,6 +7,7 @@ in
 {
   pkg,
   name,
+  pkgBin ? "",
   proxy ? { },
   env ? { },
 }:
@@ -23,7 +24,7 @@ let
         ${
           # codex (and possibly others define proxies in config file)
           if (lib.hasAttr "url" proxy) && (proxy.url != { })
-          then "export \${proxy.url.var}=\"\${proxy.url.value}\""
+          then "export ${proxy.url.var}=\"${proxy.url.value}\""
           else ""
         }
         export ${proxy.auth.var}="$(cat ${proxy.auth.file})"
@@ -43,7 +44,7 @@ pkgs.writeTextFile {
       lib.mapAttrsToList (k: v: "export ${k}=\"\${${k}:-${toString v}}\"") env
     )}
 
-    exec ${lib.getExe' pkg "${name}"} "$@"
+    exec ${lib.getExe' pkg (if pkgBin == "" then name else pkgBin)} "$@"
   '';
   executable = true;
   destination = "/bin/${name}";
