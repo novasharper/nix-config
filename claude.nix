@@ -68,6 +68,18 @@ in
       permissions = {
         defaultMode = "default";
         disableBypassPermissionsMode = "disable";
+        deny = [
+          "Bash(rm -rf *)"
+          "Bash(rm -fr *)"
+          "Bash(sudo *)"
+          "Bash(mkfs *)"
+          "Bash(dd *)"
+          "Bash(wget *|bash*)"
+          "Bash(wget *| bash*)"
+          "Bash(git push --force*)"
+          "Bash(git push *--force*)"
+          "Bash(git reset --hard*)"
+        ];
       };
       includeCoAuthoredBy = false;
       attribution = {
@@ -77,6 +89,35 @@ in
       statusLine = {
         type = "command";
         command = ./contrib/claude-session-info.py;
+      };
+      sandbox = {
+        enabled = true;
+        failIfUnavailable = true;
+        filesystem = {
+          denyRead = [
+            ".env"
+            "./secrets"
+            # External Files
+            "~/.llm-auth-key"
+            "~/.netrc"
+            "~/.npmrc"
+            # External Paths
+            "~/.gnupg/**"
+            "~/.config/gh/**"
+            "~/.docker/config.json"
+            "~/.kube/**"
+            "~/.npm/**"
+            "~/.ssh/**"
+            "~/Library/Keychains/**"
+          ];
+          denyWrite = {
+            ".env"
+            # External Files
+            "~/.bashrc"
+            "~/.zshrc"
+            "~/.ssh/**"
+          };
+        };
       };
     };
   };
