@@ -62,9 +62,16 @@ in
     settings = {
       autoMemoryEnabled = true;
       model = "sonnet";
-      sandbox = {
-        enabled = true;
+      includeCoAuthoredBy = false;
+      attribution = {
+        commit = "";
+        pr = "";
       };
+      statusLine = {
+        type = "command";
+        command = ./contrib/claude-session-info.py;
+      };
+      # Sandbox/Permissions
       permissions = {
         defaultMode = "default";
         disableBypassPermissionsMode = "disable";
@@ -80,15 +87,6 @@ in
           "Bash(git push *--force*)"
           "Bash(git reset --hard*)"
         ];
-      };
-      includeCoAuthoredBy = false;
-      attribution = {
-        commit = "";
-        pr = "";
-      };
-      statusLine = {
-        type = "command";
-        command = ./contrib/claude-session-info.py;
       };
       sandbox = {
         enabled = true;
@@ -110,13 +108,13 @@ in
             "~/.ssh/**"
             "~/Library/Keychains/**"
           ];
-          denyWrite = {
+          denyWrite = [
             ".env"
             # External Files
             "~/.bashrc"
             "~/.zshrc"
             "~/.ssh/**"
-          };
+          ];
         };
       };
     };
