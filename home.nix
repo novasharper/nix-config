@@ -35,6 +35,7 @@ in
     ./git.nix
     ./shells.nix
     ./vim.nix
+    ./vscode.nix
   ]
   ++ lib.optional (builtins.pathExists localConf) localConf
   ++ lib.optional stdenv.isLinux ./linux.nix
@@ -337,47 +338,6 @@ in
         set -g window-status-format ' #I:#W#F '
         set -g window-status-current-format '#[bg=white,fg=black] #I:#W#F '
       '';
-    };
-
-    vscode = enable {
-      profiles.default = {
-        extensions = with pkgs.nix-vscode-extensions.vscode-marketplace; [
-          anthropic.claude-code
-          bbenoist.nix
-          golang.go
-          lencerf.beancount
-          misodee.vscode-nbt
-          ms-python.python
-          ms-python.vscode-pylance
-          ms-vscode-remote.remote-containers
-          ms-vscode-remote.remote-ssh
-          redhat.java
-          redhat.vscode-yaml
-          rust-lang.rust-analyzer
-          tamasfe.even-better-toml
-          # Raspberry Pi Pico
-          # Disabling until supports system toolchain
-          raspberry-pi.raspberry-pi-pico
-          paulober.pico-w-go
-          marus25.cortex-debug
-          mcu-debug.debug-tracker-vscode
-          mcu-debug.memory-view
-          mcu-debug.rtos-views
-          mcu-debug.peripheral-viewer
-        ];
-        enableExtensionUpdateCheck = false;
-        enableUpdateCheck = false;
-        userSettings = {
-          "[nix]"."editor.tabSize" = 2;
-          "dev.containers.dockerPath" = "podman";
-          "extensions.autoUpdate" = false;
-          "files.autoSave" = "off";
-          "window.autoDetectColorScheme" = true;
-          "claudeCode.preferredLocation" = "panel";
-          "redhat.telemetry.enabled" = false;
-        };
-      };
-      mutableExtensionsDir = false;
     };
 
     yt-dlp = enable {
