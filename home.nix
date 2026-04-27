@@ -34,16 +34,12 @@ in
   imports = [
     ./git.nix
     ./shells.nix
-    ./vim.nix
-    ./vscode.nix
+    ./agents
+    ./editors
   ]
   ++ lib.optional (builtins.pathExists localConf) localConf
   ++ lib.optional stdenv.isLinux ./linux.nix
-  ++ lib.optionals stdenv.isDarwin [
-    ./darwin.nix
-    ./claude.nix
-    ./codex.nix
-  ];
+  ++ lib.optional stdenv.isDarwin ./darwin.nix;
 
   home = {
     username = username;
