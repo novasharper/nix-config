@@ -63,42 +63,56 @@ in
       ];
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
-      userSettings = flattenSettings "" {
-        chat = {
-          agent.enabled = false;
-          disableAIFeatures = true;
-          useAgentSkills = false;
+      userSettings =
+        (flattenSettings "" {
+          chat = {
+            agent.enabled = false;
+            disableAIFeatures = true;
+            useAgentSkills = false;
+          };
+          claudeCode = {
+            preferredLcation = "sidebar";
+            environmentVariables = [
+              "ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6"
+              "ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6"
+              "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1"
+              "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1"
+            ];
+          };
+          containers = {
+            containerClient = "com.microsoft.visualstudio.containers.podman";
+            orchestratorClient = "com.microsoft.visualstudio.containers.podmancompose";
+          };
+          dev.containers.dockerpath = "podman";
+          files = {
+            autoSave = "off";
+            insertFinalNewline = true;
+            trimFinalNewlines = true;
+          };
+          git.blame = {
+            editorDecoration.enabled = true;
+            statusBarItem.enabled = true;
+          };
+          window.autoDetectColorScheme = true;
+          "[nix]" = {
+            editor.tabSize = 2;
+          };
+          github.copilot.chat.reviewAgent.enabled = false;
+          redhat.telemetry.enabled = false;
+        })
+        // {
+          "terminal.integrated.profiles.osx" = {
+            bash = {
+              path = "/bin/bash";
+              args = [ "-l" ];
+              icon = "terminal-bash";
+            };
+            zsh = {
+              path = "/bin/zsh";
+              args = [ "-l" ];
+            };
+          };
         };
-        claudeCode = {
-          preferredLcation = "sidebar";
-          environmentVariables = [
-            "ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6"
-            "ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6"
-            "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1"
-            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1"
-          ];
-        };
-        containers = {
-          containerClient = "com.microsoft.visualstudio.containers.podman";
-          orchestratorClient = "com.microsoft.visualstudio.containers.podmancompose";
-        };
-        dev.containers.dockerpath = "podman";
-        files = {
-          autoSave = "off";
-          insertFinalNewline = true;
-          trimFinalNewlines = true;
-        };
-        git.blame = {
-          editorDecoration.enabled = true;
-          statusBarItem.enabled = true;
-        };
-        window.autoDetectColorScheme = true;
-        "[nix]" = {
-          editor.tabSize = 2;
-        };
-        github.copilot.chat.reviewAgent.enabled = false;
-        redhat.telemetry.enabled = false;
-      };
     };
     mutableExtensionsDir = false;
   };
