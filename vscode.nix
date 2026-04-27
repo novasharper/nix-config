@@ -20,7 +20,7 @@ let
           if isLanguageKey then
             { "${key}" = flattenSettings "" value; }
           else
-            value
+            flattenSettings key value
         else
           { "${key}" = value; }
       )
