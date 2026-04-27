@@ -8,23 +8,18 @@ let
   enable = x: x // { enable = true; };
   flattenSettings =
     prefix: attrs:
-    lib.concatMapAttrs
-      (
-        name: value:
-        let
-          key = if prefix == "" then name else "${prefix}.${name}";
-          # Detect language-specific keys like python
-          isLanguageKey = lib.hasPrefix "[" name;
-        in
-        if builtins.isAttrs value && !lib.isDerivation value then
-          if isLanguageKey then
-            { "${key}" = flattenSettings "" value; }
-          else
-            flattenSettings key value
-        else
-          { "${key}" = value; }
-      )
-      attrs;
+    lib.concatMapAttrs (
+      name: value:
+      let
+        key = if prefix == "" then name else "${prefix}.${name}";
+        # Detect language-specific keys like python
+        isLanguageKey = lib.hasPrefix "[" name;
+      in
+      if builtins.isAttrs value && !lib.isDerivation value then
+        if isLanguageKey then { "${key}" = flattenSettings "" value; } else flattenSettings key value
+      else
+        { "${key}" = value; }
+    ) attrs;
 
 in
 {

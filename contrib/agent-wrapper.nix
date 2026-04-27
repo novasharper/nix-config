@@ -23,9 +23,10 @@ let
 
         ${
           # codex (and possibly others define proxies in config file)
-          if (lib.hasAttr "url" proxy) && (proxy.url != { })
-          then "export ${proxy.url.var}=\"${proxy.url.value}\""
-          else ""
+          if (lib.hasAttr "url" proxy) && (proxy.url != { }) then
+            "export ${proxy.url.var}=\"${proxy.url.value}\""
+          else
+            ""
         }
         export ${proxy.auth.var}="$(cat ${proxy.auth.file})"
       ''
@@ -48,6 +49,7 @@ pkgs.writeTextFile {
   '';
   executable = true;
   destination = "/bin/${name}";
-} // {
+}
+// {
   inherit (pkg) version;
 }
