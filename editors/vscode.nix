@@ -62,7 +62,7 @@ in
             useAgentSkills = false;
           };
           claudeCode = {
-            preferredLcation = "sidebar";
+            preferredLocation = "sidebar";
             environmentVariables = [
               "ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6"
               "ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6"
