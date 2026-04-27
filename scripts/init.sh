@@ -2,6 +2,7 @@
 set -e
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REPO_ROOT="$( cd "$CURRENT_DIR/.." && pwd )"
 unset LD_LIBRARY_PATH
 
 case "$OSTYPE" in
@@ -29,14 +30,9 @@ if [[ ! -d ~/.config ]] ; then
     mkdir ~/.config
 fi
 
-if [[ ! -d ~/.config/nixpkgs ]] ; then
-    echo "Linking in nix config"
-    ln -s "$CURRENT_DIR/nixpkgs" ~/.config
-fi
-
 if [[ ! -d ~/.config/home-manager ]] ; then
     echo "Linking in user environment config"
-    ln -s "$CURRENT_DIR/home-manager" ~/.config
+    ln -s "$REPO_ROOT" ~/.config/home-manager
 fi
 
 if ! command -v home-manager &>/dev/null ; then
