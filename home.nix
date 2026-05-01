@@ -56,6 +56,7 @@ in
       # --- go ---
       golangci-lint
       gotools
+      govulncheck
       # --- python ---
       pythonEnv
       pipenv
@@ -90,6 +91,7 @@ in
       kubernetes-helm
       lima-full
       mosh
+      osv-scanner
       qpdf
       ripgrep
       rsync
