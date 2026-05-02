@@ -22,6 +22,9 @@ in
       ncdu
       wget
     ];
+    shellAliases = {
+      dequarantine = "xattr -d com.apple.quarantine";
+    }
   };
 
   programs = {
