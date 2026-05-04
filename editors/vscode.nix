@@ -39,6 +39,7 @@ in
         redhat.java
         redhat.vscode-yaml
         rust-lang.rust-analyzer
+        samuelcolvin.jinjahtml
         tamasfe.even-better-toml
         # Raspberry Pi Pico
         # Disabling until supports system toolchain
