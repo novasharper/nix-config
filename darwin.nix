@@ -24,7 +24,7 @@ in
     ];
     shellAliases = {
       dequarantine = "xattr -d com.apple.quarantine";
-    }
+    };
   };
 
   programs = {
