@@ -27,6 +27,8 @@ let
     ps.setuptools
     ps.tox
     ps.virtualenv
+    ps.numpy
+    ps.scipy
   ]);
 
 in
@@ -75,6 +77,7 @@ in
       cargo-expand
 
       # === general ===
+      ansible-lint
       bat
       beancount # Text-based ledger
       catt # Cast ALL the things
