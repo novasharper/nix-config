@@ -66,6 +66,8 @@ in
       # --- nix ---
       hydra-check
       nixpkgs-fmt
+      nil
+      nixd
       # --- rust-lang ---
       # cargo
       # cargo-binutils
