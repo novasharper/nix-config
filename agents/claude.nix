@@ -10,8 +10,6 @@ let
     pkg = pkgs.claude-code;
     name = "claude";
     env = {
-      ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-6";
-      ANTHROPIC_DEFAULT_OPUS_MODEL = "claude-opus-4-8";
       CLAUDE_CODE_ATTRIBUTION_HEADER = 0;
       CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS = 1;
       CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = 1;
