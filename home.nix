@@ -89,7 +89,7 @@ in
       fastfetch
       fava # BeanCount Web UI
       fusee-interfacee-tk
-      gpxsee
+      #gpxsee
       htop
       httpie
       jq
