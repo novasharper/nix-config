@@ -25,14 +25,32 @@
             ];
           };
         };
-        ollama = {
-          api_url = "http://localhost:11434";
+        open_router = {
+          api_url = "https://openrouter.ai/api/v1";
+          available_models = [
+            {
+              name = "openrouter/auto";
+              display_name = "Auto Router";
+              max_tokens = 2000000;
+              supports_tools = true;
+              provider = {
+                order = [
+                  "mistralai"
+                  "openai"
+                  "anthropic"
+                ];
+                allow_fallbacks = true;
+                require_parameters = true;
+                data_collection = "disallow";
+              };
+            }
+          ];
         };
       };
       agent = {
         default_model = {
-          provider = "LLAMA-SERVER";
-          model = "mistral-small-4";
+          provider = "open_router";
+          model = "openai/gpt-5.6-terra";
           enable_thinking = true;
         };
         dock = "right";
