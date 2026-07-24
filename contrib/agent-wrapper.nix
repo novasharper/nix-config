@@ -10,6 +10,7 @@ in
   pkgBin ? "",
   proxy ? { },
   env ? { },
+  extraArgs ? [ ],
 }:
 
 let
@@ -45,7 +46,11 @@ pkgs.writeTextFile {
       lib.mapAttrsToList (k: v: "export ${k}=\"\${${k}:-${toString v}}\"") env
     )}
 
-    exec ${lib.getExe' pkg (if pkgBin == "" then name else pkgBin)} "$@"
+    exec ${
+      lib.getExe' pkg (if pkgBin == "" then name else pkgBin)
+    } ${
+      builtins.concatStringsSep " " (lib.map (v: "\"${toString v}\"") extraArgs)
+    } "$@"
   '';
   executable = true;
   destination = "/bin/${name}";
