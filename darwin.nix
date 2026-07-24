@@ -16,6 +16,7 @@ in
     packages = with pkgs; [
       ffmpeg
       gnupg
+      goose
       # TODO: Broken
       #keepassxc
       libreoffice-bin
