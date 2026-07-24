@@ -1,14 +1,14 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 
 {
   imports = [
     ./claude.nix
     ./codex.nix
+    ./pi
   ];
 
   options = {
