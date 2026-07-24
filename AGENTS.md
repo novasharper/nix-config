@@ -1,42 +1,39 @@
 # Repository Guidelines
 
-This is a [home-manager](https://github.com/nix-community/home-manager) flake-based Nix configuration for user `pllong`.
-It manages dotfiles and environment across macOS (Darwin) and Linux.
+This repository is a Home Manager flake for user `pllong`. It manages shell tools, editors, agents, and platform-specific settings across macOS (Darwin) and Linux.
 
-## Project Structure
+## Project Structure & Module Organization
 
-- **Root Nix files** — Configuration entry points: `flake.nix`, `home.nix`, `darwin.nix`, `linux.nix`, `shells.nix`
-- **home-manager/** — Main home-manager flake (symlinked to `~/.config/home-manager`)
-- **nixpkgs/** — Legacy nixpkgs config (symlinked to `~/.config/nixpkgs`)
-- **scripts/** — Bootstrap and setup scripts (`init.sh`, `install-nix.sh`)
-- **contrib/** — Custom derivations and scripts (`claude-session-info.py`, `agent-wrapper.nix`)
+- Root modules are the primary entry points: `flake.nix`, `home.nix`, `darwin.nix`, `linux.nix`, and `shells.nix`.
+- `editors/` contains Vim, VSCodium, and Zed configuration.
+- `agents/` contains Claude and Codex modules.
+- `contrib/` provides custom derivations, overlays, and helper programs.
+- `scripts/` contains installation and bootstrap scripts.
+- `home-manager/` and `nixpkgs/` support configuration paths under `~/.config`.
 
-## Key Commands
+Keep changes in the narrowest relevant module. Put shared settings in `home.nix` or a focused module; keep OS-specific behavior in `darwin.nix` or `linux.nix`.
 
-| Command | Description |
-|---------|-------------|
-| `home-manager switch` | Apply configuration changes |
-| `update-home` | Update flakes, upgrade Nix, and switch |
-| `nix flake update --flake ~/.config/home-manager` | Update flake lock file |
-| `./scripts/init.sh` | Bootstrap on new machine |
-| `nixpkgs-fmt <file.nix>` | Format Nix files |
+## Build, Test, and Development Commands
 
-## Coding Style
+- `home-manager build` builds the configuration without activating it.
+- `home-manager switch --dry-run` previews activation changes.
+- `home-manager switch` builds and applies the current configuration.
+- `nix eval .#legacyPackages.<system>.homeConfigurations.pllong.activationPackage` checks flake evaluation; replace `<system>` with a target such as `aarch64-darwin`.
+- `nix flake update --flake ~/.config/home-manager` updates locked inputs.
+- `./scripts/init.sh` bootstraps a new machine.
 
-- Use `enable = x: x // { enable = true; }` to enable home-manager programs
-- Pass `nixVersion` as `extraSpecialArgs` for channel construction
-- VSCode is configured as VSCodium (`pkgs.vscodium`) with immutable extensions directory
-- Format Nix files with `nixpkgs-fmt` before committing
-- Follow commit message pattern: `<scope>: <description>` (e.g., `flake: update inputs`)
+## Coding Style & Naming Conventions
 
-## Testing & Validation
+Use two-space indentation in Nix files and run `nixpkgs-fmt <file.nix>` before submitting changes. Prefer small, composable modules and existing repository patterns. Use `enable = x: x // { enable = true; };` when enabling Home Manager programs, and pass `nixVersion` through `extraSpecialArgs` for channel construction. VSCodium is configured through `pkgs.vscodium`; preserve its immutable extensions setup.
 
-- No automated tests; validate with `nix eval` or `home-manager build`
-- Use `home-manager switch --dry-run` to preview changes
-- Check evaluation: `nix eval .#legacyPackages.<system>.homeConfigurations.pllong.activationPackage`
+Name new modules descriptively with lowercase, hyphenated filenames where needed. Shell scripts should use clear command names and fail safely.
 
-## Commit Guidelines
+## Testing Guidelines
 
-- Prefix scopes: `flake`, `packages`, `shells`, `vim`, `vscode`, `claude`, `codex`
-- Reference issues/PRs in body when applicable
-- Keep commits focused; one change per commit when possible
+There is no automated test suite or coverage requirement. At minimum, format changed Nix files and run an evaluation or `home-manager build`. For activation-sensitive changes, inspect `home-manager switch --dry-run` before applying them. Validate both Darwin and Linux branches when modifying shared logic.
+
+## Commit & Pull Request Guidelines
+
+Use focused commits with subjects in the form `<scope>: <description>`, for example `flake: update inputs` or `packages: remove gemini-cli`. Common scopes include `flake`, `packages`, `shells`, `vim`, `vscode`, `claude`, and `codex`.
+
+Pull requests should explain the configuration change, identify affected platforms, list validation commands, and link relevant issues. Include screenshots only for visible editor or UI changes.
