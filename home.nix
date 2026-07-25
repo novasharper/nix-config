@@ -181,9 +181,8 @@ in
       "$HOME/.nix-profile/bin"
       "/nix/var/nix/profiles/default/bin"
     ];
-    sessionVariables = {
-      EDITOR = "${lib.getExe pkgs.vim}";
-    };
+    # EDITOR is set to nvim by programs.neovim.defaultEditor in editors/nvim.nix.
+    sessionVariables = { };
     stateVersion = "25.11";
   };
 

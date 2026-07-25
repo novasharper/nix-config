@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 
 let
@@ -31,6 +30,7 @@ in
       ls = "ls --color=auto";
       l = "ls -lAh";
       ltr = "ls -ltrAh";
+      nv = "nvim";
       view = "vim -R";
       less = "less -r";
       grep = "grep --color=auto";

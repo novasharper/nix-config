@@ -5,7 +5,7 @@ This repository is a Home Manager flake for user `pllong`. It manages shell tool
 ## Project Structure & Module Organization
 
 - Root modules are the primary entry points: `flake.nix`, `home.nix`, `darwin.nix`, `linux.nix`, and `shells.nix`.
-- `editors/` contains Vim, VSCodium, and Zed configuration.
+- `editors/` contains Vim, Neovim, VSCodium, and Zed configuration.
 - `agents/` contains Claude and Codex modules.
 - `contrib/` provides custom derivations, overlays, and helper programs.
 - `scripts/` contains installation and bootstrap scripts.
