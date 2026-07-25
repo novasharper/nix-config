@@ -1,6 +1,5 @@
 {
   inputs,
-  config,
   pkgs,
   lib,
   nixVersion ? "unstable",
@@ -16,12 +15,6 @@ let
   localConf = "${confdir}/nix-local/default.nix";
 
   # package wrappers
-  pyradioWrapper = pkgs.pyradio.overrideAttrs (
-    self: super: {
-      propagatedBuildInputs = super.propagatedBuildInputs ++ [ pkgs.mpv ];
-    }
-  );
-
   pythonEnv = pkgs.python314.withPackages (ps: [
     ps.pylint
     ps.setuptools

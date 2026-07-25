@@ -4,20 +4,21 @@ let
   inherit (pkgs) lib;
 
 in
-{ pkg
-, name
-, pkgBin ? ""
-, proxy ? { }
-, env ? { }
-, extraArgs ? [ ]
-, strictAuthPermissions ? false
-,
+{
+  pkg,
+  name,
+  pkgBin ? "",
+  proxy ? { },
+  env ? { },
+  extraArgs ? [ ],
+  strictAuthPermissions ? false,
 }:
 
 # The auth permission check is only emitted as part of the proxy setup, so
 # strictAuthPermissions without a proxy would silently do nothing.
-assert lib.assertMsg (!strictAuthPermissions || proxy != { })
-  "mkAgentWrapper (${name}): strictAuthPermissions requires proxy.auth to be set";
+assert lib.assertMsg (
+  !strictAuthPermissions || proxy != { }
+) "mkAgentWrapper (${name}): strictAuthPermissions requires proxy.auth to be set";
 
 let
   authPermissionsPart =
@@ -58,27 +59,24 @@ let
       "";
 
 in
-pkgs.writeTextFile
-  {
-    inherit name;
+pkgs.writeTextFile {
+  inherit name;
 
-    text = ''
-      #!${lib.getExe pkgs.bash}
+  text = ''
+    #!${lib.getExe pkgs.bash}
 
-      ${proxyPart}
-      ${builtins.concatStringsSep "\n" (
-        lib.mapAttrsToList (k: v: "export ${k}=\"\${${k}:-${toString v}}\"") env
-      )}
+    ${proxyPart}
+    ${builtins.concatStringsSep "\n" (
+      lib.mapAttrsToList (k: v: "export ${k}=\"\${${k}:-${toString v}}\"") env
+    )}
 
-      exec ${
-        lib.getExe' pkg (if pkgBin == "" then name else pkgBin)
-      } ${
-        builtins.concatStringsSep " " (lib.map (v: "\"${toString v}\"") extraArgs)
-      } "$@"
-    '';
-    executable = true;
-    destination = "/bin/${name}";
-  }
-  // {
+    exec ${lib.getExe' pkg (if pkgBin == "" then name else pkgBin)} ${
+      builtins.concatStringsSep " " (lib.map (v: "\"${toString v}\"") extraArgs)
+    } "$@"
+  '';
+  executable = true;
+  destination = "/bin/${name}";
+}
+// {
   inherit (pkg) version;
 }

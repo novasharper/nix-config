@@ -1,9 +1,7 @@
 {
   self,
-  config,
   pkgs,
   lib,
-  nixVersion,
   ...
 }:
 
@@ -29,7 +27,7 @@ in
           let
             data = lib.optionals (_moduleMatch != null) (builtins.split "," (builtins.head _moduleMatch));
           in
-          builtins.trace "[NixGL] Detected Modules: ${builtins.toString data}" data;
+          builtins.trace "[NixGL] Detected Modules: ${toString data}" data;
         # i915           = intel module
         # nvidia_modeset = nvidia module
         # amdgpu         = amd module

@@ -1,13 +1,10 @@
 {
-  config,
   pkgs,
   lib,
-  nixVersion,
   ...
 }:
 
 let
-  stdenv = pkgs.stdenv;
   enable = x: x // { enable = true; };
 
 in
