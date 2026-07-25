@@ -26,7 +26,7 @@
       core = {
         whitespace = "space-before-tab,indent-with-non-tab,trailing-space";
         pager = "less -F -X";
-        editor = "vim";
+        editor = "nvim";
       };
       http = {
         sslVerify = "true";
