@@ -21,6 +21,28 @@ final: prev:
       };
     };
   };
+
+  tmuxPlugins = prev.tmuxPlugins // {
+    catppuccin = final.tmuxPlugins.mkTmuxPlugin rec {
+      pluginName = "catppuccin";
+      version = "2.3.0";
+      src = final.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "tmux";
+        rev = "v${version}";
+      };
+      postInstall = ''
+        sed -i -e 's|''${PLUGIN_DIR}/catppuccin-selected-theme.tmuxtheme|''${TMUX_TMPDIR}/catppuccin-selected-theme.tmuxtheme|g' $target/catppuccin.tmux
+      '';
+      meta = {
+        homepage = "https://github.com/catppuccin/tmux";
+        description = "Soothing pastel theme for Tmux";
+        license = final.lib.licenses.mit;
+        platforms = final.lib.platforms.unix;
+        maintainers = [ ];
+      };
+    };
+  };
 }
 // (builtins.mapAttrs (
   name: value:

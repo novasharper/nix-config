@@ -306,6 +306,32 @@ in
 
     tmux = enable {
       plugins = with pkgs.tmuxPlugins; [
+        {
+          plugin = catppuccin;
+          extraConfig = ''
+            set -g @catppuccin_flavor "latte"
+            set -g @catppuccin_window_status_style "rounded"
+
+            set-hook -g client-dark-theme {
+              set -g @catppuccin_flavor "frappe"
+              set -g @catppuccin_reset "true"
+
+              # NOTE: you may need to set more `@catppuccin_*` variables to fully reset
+              # everything.
+
+              run ${catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
+            }
+            set-hook -g client-light-theme {
+              set -g @catppuccin_flavor "latte"
+              set -g @catppuccin_reset "true"
+
+              # NOTE: you may need to set more `@catppuccin_*` variables to fully reset
+              # everything.
+
+              run ${catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
+            }
+          '';
+        }
         pain-control
         {
           plugin = prefix-highlight;
@@ -320,19 +346,11 @@ in
       ];
       shell = "${pkgs.zsh}/bin/zsh";
       shortcut = "a";
-      terminal = "screen-256color";
+      terminal = "tmux-256color";
       extraConfig = ''
         # Left Status
         set -g status-left '[ #h:#S ] '
         set -g status-left-length 30
-
-        # Window title options
-        set-window-option -g window-status-style bright
-        set-window-option -g window-status-current-style bright
-
-        # Active window title colors
-        set -g window-status-format ' #I:#W#F '
-        set -g window-status-current-format '#[bg=white,fg=black] #I:#W#F '
       '';
     };
 
