@@ -17,6 +17,11 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
+    # Nix Community
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -25,14 +30,13 @@
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    fenix = {
-      url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixgl = {
       url = "github:nix-community/nixgl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixvim.url = "github:nix-community/nixvim";
+
+    # Local
     contrib = {
       url = ./contrib;
       inputs.nixpkgs.follows = "nixpkgs";
@@ -75,6 +79,7 @@
             pllong = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [
+                inputs.nixvim.homeModules.nixvim
                 ./home.nix
               ];
               extraSpecialArgs = {
