@@ -30,6 +30,7 @@ final: prev:
         owner = "catppuccin";
         repo = "tmux";
         rev = "v${version}";
+        sha256 = "3CJRQCgS8NAN7vOLBjNGiHbGXTIrIyY/FLmfZrXcEYc=";
       };
       postInstall = ''
         sed -i -e 's|''${PLUGIN_DIR}/catppuccin-selected-theme.tmuxtheme|''${TMUX_TMPDIR}/catppuccin-selected-theme.tmuxtheme|g' $target/catppuccin.tmux
