@@ -106,6 +106,7 @@ in
       #pyradioWrapper
       # --- fonts ---
       office-code-pro
+      nerd-fonts.fira-code
     ];
 
     file = {
@@ -242,18 +243,21 @@ in
     ghostty = enable {
       package = if stdenv.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
       settings = {
-        theme = "light:Catppuccin Latte,dark:Catppuccin Mocha";
+        auto-update = "off";
         background-opacity = 0.95;
         background-blur = 10;
-        window-padding-x = 16;
-        window-padding-y = 16;
-        window-padding-balance = true; # centers text when window doesn't match cell grid
-        window-padding-color = "background";
+        font-family = "FiraCode Nerd Font Mono";
+        font-size = 12;
+        quit-after-last-window-closed = true;
         scrollback-limit = 100000000; # ~100mb per terminal
         scrollbar = "system"; # default - follows GTK system settings
         shell-integration = "detect";
         shell-integration-features = "cursor,sudo,title";
-        quit-after-last-window-closed = true;
+        theme = "light:Catppuccin Latte,dark:Catppuccin Mocha";
+        window-padding-x = 4;
+        window-padding-y = 4;
+        window-padding-balance = true; # centers text when window doesn't match cell grid
+        window-padding-color = "background";
         keybind = [
           "ctrl+shift+up=jump_to_prompt:-1" # previous prompt
           "ctrl+shift+down=jump_to_prompt:1" # next prompt
