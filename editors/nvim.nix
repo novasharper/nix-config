@@ -6,17 +6,6 @@
     let
       raw = lib.nixvim.mkRaw;
 
-      transparentHighlights = {
-        Normal.bg = "none";
-        NormalNC.bg = "none";
-        NonText.bg = "none";
-        SignColumn.bg = "none";
-        CursorLine.bg = "lightgray";
-        CursorColumn.bg = "lightgray";
-        Search.bg = "lightgray";
-        Visual.bg = "lightgray";
-      };
-
     in
     {
       enable = true;
@@ -60,8 +49,6 @@
           };
         };
       };
-
-      highlightOverride = transparentHighlights;
 
       diagnostic.settings = {
         loclist.open = false;
@@ -256,18 +243,6 @@
       autoGroups.NixConfig.clear = true;
 
       autoCmd = [
-        {
-          event = "ColorScheme";
-          group = "NixConfig";
-          callback = raw ''
-            function()
-              local highlights = ${lib.nixvim.toLuaObject transparentHighlights}
-              for name, settings in pairs(highlights) do
-                vim.api.nvim_set_hl(0, name, settings)
-              end
-            end
-          '';
-        }
         {
           event = "FileType";
           group = "NixConfig";

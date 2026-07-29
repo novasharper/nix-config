@@ -302,6 +302,7 @@ in
     };
 
     go.enable = true;
+    neovide.enable = true;
 
     tmux = enable {
       plugins = with pkgs.tmuxPlugins; [
