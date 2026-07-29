@@ -93,7 +93,6 @@ in
       qpdf
       ripgrep
       rsync
-      tmux
       tree
       # --- Raspberry Pi Pico ---
       pico-sdk
@@ -320,6 +319,12 @@ in
               # everything.
 
               run ${catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
+
+              set -g @catppuccin_window_status_style "rounded"
+              set -g @catppuccin_window_current_left_separator "#{@catppuccin_window_left_separator}"
+              set -g @catppuccin_window_current_right_separator "#{@catppuccin_window_right_separator}"
+
+              run ${catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
             }
             set-hook -g client-light-theme {
               set -g @catppuccin_flavor "latte"
@@ -327,6 +332,12 @@ in
 
               # NOTE: you may need to set more `@catppuccin_*` variables to fully reset
               # everything.
+
+              run ${catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
+
+              set -g @catppuccin_window_status_style "rounded"
+              set -g @catppuccin_window_current_left_separator "#{@catppuccin_window_left_separator}"
+              set -g @catppuccin_window_current_right_separator "#{@catppuccin_window_right_separator}"
 
               run ${catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
             }
