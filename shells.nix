@@ -21,7 +21,7 @@ in
       enableZshIntegration = true;
     };
     shellAliases = {
-      e = "\${EDITOR:-emacs -nw}";
+      e = "\${EDITOR:-nvim}";
       "rm~" = "find . -type f -name \\*~ -delete";
       rmTilda = "find . -type f -name \\*~ -delete";
       path = "echo -e $PATH | sed 's/:/\\n/g'";
@@ -31,7 +31,7 @@ in
       l = "ls -lAh";
       ltr = "ls -ltrAh";
       nv = "nvim";
-      view = "vim -R";
+      view = "nvim -R";
       less = "less -r";
       grep = "grep --color=auto";
       # git
