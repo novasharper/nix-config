@@ -55,7 +55,8 @@ in
       # --- python ---
       pythonEnv
       pipenv
-      poetry
+      # TODO: currently broken in hydra
+      #poetry
       # --- nix ---
       hydra-check
       nixpkgs-fmt
