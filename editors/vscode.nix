@@ -24,6 +24,8 @@ in
       extensions = with pkgs.nix-vscode-extensions.vscode-marketplace; [
         anthropic.claude-code
         bbenoist.nix
+        catppuccin.catppuccin-vsc
+        catppuccin.catppuccin-vsc-icons
         golang.go
         lencerf.beancount
         misodee.vscode-nbt
@@ -76,6 +78,10 @@ in
             orchestratorClient = "com.microsoft.visualstudio.containers.podmancompose";
           };
           dev.containers.dockerpath = "podman";
+          editor = {
+            fontFamily = "'FiraCode Nerd Font Mono'";
+            semanticHighlighting.enabled = true;
+          };
           files = {
             autoSave = "off";
             insertFinalNewline = true;
@@ -85,12 +91,21 @@ in
             editorDecoration.enabled = true;
             statusBarItem.enabled = true;
           };
-          window.autoDetectColorScheme = true;
+          window = {
+            autoDetectColorScheme = true;
+            titleBarStyle = "custom";
+          };
+          workbench = {
+            iconTheme = "catpuccin-latte";
+            preferredDarkColorTheme = "Catppuccin Mocha";
+            preferredLightColorTheme = "Catppuccin Latte";
+          };
           "[nix]" = {
             editor.tabSize = 2;
           };
           github.copilot.chat.reviewAgent.enabled = false;
           redhat.telemetry.enabled = false;
+          terminal.integrated.minimumContrastRatio = 1;
         })
         // {
           "terminal.integrated.profiles.osx" = {

@@ -40,13 +40,16 @@
       colorschemes.catppuccin = {
         enable = true;
         settings = {
-          transparent = true;
-          terminal_colors = true;
+          integrations = {
+            lualine = true;
+          };
           styles = {
             comments = [ "italic" ];
             functions = [ "bold" ];
             keywords = [ "italic" ];
           };
+          transparent = true;
+          terminal_colors = true;
         };
       };
 
