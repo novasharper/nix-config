@@ -79,6 +79,7 @@
             pllong = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [
+                inputs.contrib.homeModules.default
                 inputs.nixvim.homeModules.nixvim
                 ./home.nix
               ];

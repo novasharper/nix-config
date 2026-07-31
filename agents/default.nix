@@ -8,6 +8,7 @@
   imports = [
     ./claude.nix
     ./codex.nix
+    ./goose.nix
     ./pi
   ];
 
