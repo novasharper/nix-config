@@ -85,7 +85,7 @@ export function sandboxDiagnosticText(): string {
     `Network: ${allowedDomainSummary()}`,
     "Unix sockets: blocked",
     "Local port binding: blocked",
-    "Configuration overrides: disabled",
+    "Manual per-command host execution: enabled",
   ];
   if (status.error) {
     lines.push(`Failure: ${status.error}`);

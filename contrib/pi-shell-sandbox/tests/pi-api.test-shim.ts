@@ -46,14 +46,21 @@ export function createLocalBashOperations(_options?: {
 
 export function createBashToolDefinition(
   _cwd: string,
-  _options?: BashToolOptions,
+  options?: BashToolOptions,
 ): Record<string, any> {
   return {
     name: "bash",
     label: "bash",
     description: "test bash tool",
     parameters: {},
-    async execute() {
+    async execute(
+      _toolCallId: string,
+      input: { command: string; timeout?: number },
+    ) {
+      await options?.operations?.exec(input.command, _cwd, {
+        onData() {},
+        timeout: input.timeout,
+      });
       return { content: [], details: {} };
     },
   };

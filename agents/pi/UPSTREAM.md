@@ -74,6 +74,11 @@ truthy handler result. Registering a second `user_bash` handler on the same
 extension after one that always returns is dead code. A handler that throws is
 reported through `emitError` and skipped — it does not block.
 
+The agent loop validates tool arguments once, passes that object to
+`beforeToolCall`, then retains the same object for `tool.execute`; it does not
+clone or revalidate after the event. Mutations and symbol properties attached by
+a `tool_call` handler therefore reach the tool definition.
+
 ### 1.3 ExtensionContext
 
 Handlers receive `(event, ctx)` where `ctx` is `ExtensionContext`
@@ -405,14 +410,14 @@ lists, so a new module is a one-line addition there.
 
 | Module | Role |
 | --- | --- |
-| `index.ts` | Entry point. Registers the guards, `bash` tool, session events, and `/sandbox`, then installs the bash delegate last. |
+| `index.ts` | Entry point. Registers the guards, approval-aware `bash` tool, session events, and `/sandbox`, then installs the bash delegate last. |
 | `sandbox.ts` | Sandboxed command wrapping, execution, environment sanitization, and diagnostics. |
 | `session.ts` | Serialized sandbox lifecycle, state transitions, project validation, and status. |
 | `session-resources.ts` | Session cache/temp creation, TMPDIR redirection and restoration, cleanup. |
 | `policy.ts` | `SandboxRuntimeConfig` construction, the network allowlist, the seccomp asset paths substituted by Nix. |
 | `project-scan.ts` | Enumerates in-project credential paths for `denyRead`/`denyWrite`. |
 | `environment.ts` | The child environment: credential removal and cache redirection. |
-| `security.ts` | Host-side lexical guards and the fail-closed bash delegate held on `globalThis`. |
+| `security.ts` | Host-side lexical guards, manual escalation approval tokens, and the fail-closed bash delegate held on `globalThis`. |
 | `secrets.ts` | The lexical patterns — secret paths, secret env names, destructive and credential-dumping commands. Pure. |
 | `fs-paths.ts` | realpath/symlink/normalization helpers shared by the guard and the scanner. |
 | `errors.ts` | Shared conversion of unknown failures to messages. |
@@ -420,6 +425,13 @@ lists, so a new module is a one-line addition there.
 macOS installs dynamic project-secret globs at initialization; Linux re-runs the
 literal project-secret scan immediately before every command and supplies the
 refreshed read/write denies through `customConfig`.
+
+The registered `bash` tool adds `sandbox_permissions = "require_escalated"`
+and `justification` inputs. The security handler asks for confirmation and
+attaches a module-private approval symbol after Pi validates the JSON input;
+the tool consumes that symbol before selecting local host operations. Protected
+bash access requests the same approval automatically, while protected file-tool
+access is confirmed in the guard. Missing UI or missing approval fails closed.
 
 Because nothing is bundled, `default.nix` has almost no build step — the work is
 in the check phases:

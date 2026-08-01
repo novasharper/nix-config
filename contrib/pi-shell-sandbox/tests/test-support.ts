@@ -20,6 +20,7 @@ export type CapturedExtension = {
   // Registration order is load-bearing; see UPSTREAM.md §1.2.
   registrations: string[];
   commands: Map<string, any>;
+  tools: Map<string, any>;
 };
 
 export function captureExtension(
@@ -28,6 +29,7 @@ export function captureExtension(
   const handlers = new Map<string, (...args: any[]) => any>();
   const registrations: string[] = [];
   const commands = new Map<string, any>();
+  const tools = new Map<string, any>();
 
   factory({
     on(name: string, handler: (...args: any[]) => any) {
@@ -35,6 +37,7 @@ export function captureExtension(
       registrations.push(`event:${name}`);
     },
     registerTool(tool: { name: string }) {
+      tools.set(tool.name, tool);
       registrations.push(`tool:${tool.name}`);
     },
     registerCommand(name: string, command: any) {
@@ -43,7 +46,7 @@ export function captureExtension(
     },
   });
 
-  return { handlers, registrations, commands };
+  return { handlers, registrations, commands, tools };
 }
 
 // The production delegate persists on globalThis, so tests restore it.
