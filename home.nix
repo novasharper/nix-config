@@ -226,6 +226,7 @@ in
   };
 
   programs = {
+    bun.enable = true;
     dircolors.enable = true;
     home-manager.enable = true;
 
