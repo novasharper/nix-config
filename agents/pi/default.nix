@@ -24,7 +24,14 @@ let
   # jail.enable builds its bwrap permissions that way, hence the assertion
   # below. Drop all of this once upstream's case list covers auth.
   # See UPSTREAM.md §3.3.
+  # The extension reads this at session start. It is set here rather than
+  # through programs.pi.coding-agent.environment because that option emits
+  # `export NAME=<escapeShellArg value>` (pi.nix coding-agent/options.nix:292),
+  # which cannot express a default the caller can override — and
+  # `PI_SHELL_SANDBOX=0 pi` for one invocation is worth keeping.
+  sandboxDefault = if config.agents.pi.shellSandbox.enable then "1" else "0";
   piPackageWithResources = pkgs.writeShellScriptBin "pi" ''
+    export PI_SHELL_SANDBOX="''${PI_SHELL_SANDBOX:-${sandboxDefault}}"
     case "''${1-}" in
       auth|install|remove|uninstall|update|list|config)
         exec ${lib.escapeShellArg (lib.getExe piPackage)} "$@"
@@ -47,6 +54,23 @@ let
   ];
 in
 {
+  options.agents.pi.shellSandbox.enable = lib.mkOption {
+    type = lib.types.bool;
+    default = true;
+    example = false;
+    description = ''
+      Whether pi's shell sandbox confines commands by default. The extension is
+      loaded either way — its credential and destructive-command guards stay
+      active, and `/sandbox on` re-enables confinement for a session. Turning
+      the sandbox off means the current project is trusted: commands run on the
+      host and anything inside the project is read and written without
+      confirmation.
+
+      `PI_SHELL_SANDBOX=0` (or `1`) in the environment overrides this for a
+      single invocation.
+    '';
+  };
+
   config = lib.mkIf config.agents.enable {
     home.packages = shellRuntimePackages;
 

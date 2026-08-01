@@ -5,7 +5,19 @@ import path from "node:path";
 import { SandboxManager } from "@anthropic-ai/sandbox-runtime";
 
 import { errorMessage } from "./errors.ts";
-import { backendName, sandboxConfig, validatePlatformAssets } from "./policy.ts";
+import {
+  configuredSetting,
+  isRememberedTrusted,
+  SANDBOX_SETTING_ENV,
+  type SandboxMode,
+} from "./mode.ts";
+import {
+  backendName,
+  sandboxConfig,
+  trustedRuntimeConfig,
+  trustedSandboxConfig,
+  validatePlatformAssets,
+} from "./policy.ts";
 import {
   createSessionResources,
   redirectTempEnvironment,
@@ -20,7 +32,11 @@ type SandboxPhase =
   | "initializing"
   | "active"
   | "failed"
-  | "shutting-down";
+  | "shutting-down"
+  | "disabled";
+
+// Where the current "off" came from, for the status line and diagnostics.
+export type TrustScope = "session" | "remembered" | "configured";
 
 type SandboxState = {
   phase: SandboxPhase;
@@ -32,6 +48,8 @@ type SandboxState = {
 
 export type SandboxStatus = {
   phase: SandboxPhase;
+  mode: SandboxMode;
+  trustScope: TrustScope | undefined;
   backend: string;
   project: string | undefined;
   error: string | undefined;
@@ -47,11 +65,24 @@ let state: SandboxState = { phase: "idle" };
 let initialization: Promise<void> | undefined;
 let statusUi: any;
 
+let mode: SandboxMode = "enforced";
+let trustScope: TrustScope | undefined;
+// The project a `/sandbox on|off` was issued for. session_start also fires for
+// resume and fork, and can report a different cwd; trusting one project must
+// not carry into the next project the session moves into.
+let sessionToggleProject: string | undefined;
+
 function setStatus(text: string | undefined): void {
   statusUi?.setStatus(STATUS_KEY, text);
 }
 
-function resolveProject(cwd: string): string {
+function disabledStatusText(): string {
+  return `sandbox: off — project trusted (${trustScope ?? "session"})`;
+}
+
+// Exported so the trust store is keyed by the same spelling the session
+// records; a store keyed by an unresolved path would never match.
+export function resolveProject(cwd: string): string {
   try {
     return fs.realpathSync.native(cwd);
   } catch {
@@ -94,8 +125,65 @@ async function activateRuntime(
   }
 }
 
+type ModeDecision = { mode: SandboxMode; scope: TrustScope | undefined };
+
+// A toggle covers exactly the project it was issued for; every other project
+// re-reads the remembered and configured sources.
+function decideMode(project: string): ModeDecision {
+  if (sessionToggleProject === project) {
+    return { mode, scope: trustScope };
+  }
+  sessionToggleProject = undefined;
+
+  if (isRememberedTrusted(project)) {
+    return { mode: "disabled", scope: "remembered" };
+  }
+  if (configuredSetting() === "disabled") {
+    return { mode: "disabled", scope: "configured" };
+  }
+  return { mode: "enforced", scope: undefined };
+}
+
+// Trust keeps only the OS-enforced project write boundary. Reads, network, and
+// the provider environment are unrestricted, while an explicitly approved
+// escalation can still select completely local execution.
+async function enterDisabled(project: string): Promise<void> {
+  await discardStaleSandbox();
+  state = { phase: "initializing", cwd: project };
+  setStatus("sandbox: initializing trusted write boundary");
+
+  try {
+    const resources = createSessionResources();
+    state = { ...state, resources };
+    redirectTempEnvironment(resources);
+    const initialConfig = trustedSandboxConfig(project, resources.runtimeTemp);
+    await activateRuntime(initialConfig);
+    SandboxManager.updateConfig(trustedRuntimeConfig(initialConfig));
+    state = {
+      ...state,
+      phase: "disabled",
+      backend: backendName(),
+      error: undefined,
+    };
+    setStatus(disabledStatusText());
+  } catch (error) {
+    const message = errorMessage(error);
+    await releaseSandboxResources(state);
+    state = { phase: "failed", cwd: project, error: message };
+    setStatus("sandbox: blocked (trusted write boundary failed)");
+  }
+}
+
 async function initializeNow(cwd: string): Promise<void> {
   const project = resolveProject(cwd);
+
+  const decision = decideMode(project);
+  mode = decision.mode;
+  trustScope = decision.scope;
+  if (mode === "disabled") {
+    await enterDisabled(project);
+    return;
+  }
 
   // session_start's cwd can name a different project than the one the sandbox
   // was built for. Only a live sandbox already rooted at this project is
@@ -159,8 +247,42 @@ function initializeForSession(cwd: string): Promise<void> {
   return initialization;
 }
 
+function reportStartupMode(ui: any): void {
+  if (configuredSetting() === "invalid") {
+    ui?.notify?.(
+      `${SANDBOX_SETTING_ENV} is not a recognized on/off value; the shell sandbox stays on.`,
+      "warning",
+    );
+  }
+  if (mode !== "disabled" || state.phase !== "disabled") {
+    return;
+  }
+  ui?.notify?.(
+    `Shell sandbox off: ${state.cwd} is trusted (${trustScope ?? "session"}). ` +
+      "Commands run on the host; /sandbox on re-enables it.",
+    "warning",
+  );
+}
+
 export async function beginSession(cwd: string, ui: any): Promise<void> {
   statusUi = ui;
+  await initializeForSession(cwd);
+  reportStartupMode(ui);
+}
+
+// Applies a user decision to the current project and routes it through the
+// same serialized chain as session_start, so a toggle cannot race an
+// initialization that is still running.
+export async function setSandboxMode(
+  next: SandboxMode,
+  cwd: string,
+  ui: any,
+  scope: TrustScope = "session",
+): Promise<void> {
+  statusUi = ui;
+  sessionToggleProject = resolveProject(cwd);
+  mode = next;
+  trustScope = next === "disabled" ? scope : undefined;
   await initializeForSession(cwd);
 }
 
@@ -181,6 +303,11 @@ export async function shutdownSandbox(): Promise<void> {
     await releaseSandboxResources(snapshot);
   } finally {
     state = { phase: "idle" };
+    // The session is over, so its trust decision ends with it; the next one
+    // resolves the mode from the remembered and configured sources again.
+    mode = "enforced";
+    trustScope = undefined;
+    sessionToggleProject = undefined;
     setStatus(undefined);
     statusUi = undefined;
   }
@@ -189,9 +316,46 @@ export async function shutdownSandbox(): Promise<void> {
 export function sandboxStatus(): SandboxStatus {
   return {
     phase: state.phase,
+    mode,
+    trustScope,
     backend: state.backend ?? backendName(),
     project: state.cwd,
     error: state.error,
+  };
+}
+
+// False while the project is trusted: commands then run unwrapped on the host.
+export function sandboxEnabled(): boolean {
+  return mode === "enforced";
+}
+
+// The root the guard measures "inside the project" against while trusted. It
+// is the project trust was granted for, not ctx.cwd, which can move outside
+// that tree once commands run unwrapped.
+export function trustedProject(): string | undefined {
+  return mode === "disabled" && state.phase === "disabled"
+    ? state.cwd
+    : undefined;
+}
+
+export function requireTrustedSandbox(): ActiveSandbox {
+  if (
+    mode !== "disabled" ||
+    state.phase !== "disabled" ||
+    !state.cwd ||
+    !state.resources ||
+    !SandboxManager.isSandboxingEnabled()
+  ) {
+    const detail = state.error ? `: ${state.error}` : "";
+    throw new Error(
+      `Trusted project write boundary is not active${detail}; command refused.`,
+    );
+  }
+
+  return {
+    project: state.cwd,
+    runtimeTemp: state.resources.runtimeTemp,
+    cacheRoot: state.resources.cacheRoot,
   };
 }
 

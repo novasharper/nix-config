@@ -13,6 +13,8 @@ import {
   commandSandboxConfig,
   sandboxConfig,
   sensitiveHomePaths,
+  trustedRuntimeConfig,
+  trustedSandboxConfig,
 } from "../policy.ts";
 import { tempProject } from "./test-support.ts";
 
@@ -145,6 +147,33 @@ test("runtime policy disables privileged capabilities", (context) => {
   assert.equal(config.enableWeakerNestedSandbox, false);
   assert.equal(config.allowPty, false);
   assert.equal("ignoreViolations" in config, false);
+});
+
+test("trusted policy removes read and network limits but confines writes", (context) => {
+  const project = tempProject(context, "pi-trusted-policy-test-");
+  const runtimeTemp = tempProject(context, "pi-trusted-runtime-test-");
+  const config = trustedSandboxConfig(project, runtimeTemp);
+
+  assert.deepEqual(config.network.allowedDomains, []);
+  assert.equal(config.network.allowAllUnixSockets, true);
+  assert.equal(config.network.allowLocalBinding, true);
+  assert.deepEqual(config.filesystem.denyRead, []);
+  assert.deepEqual(config.filesystem.allowWrite, [project, runtimeTemp]);
+  for (const outsideDefault of [
+    path.join(os.homedir(), ".npm/_logs"),
+    path.join(os.homedir(), ".claude/debug"),
+    "/tmp/claude",
+    "/private/tmp/claude",
+  ]) {
+    assert.ok(config.filesystem.denyWrite.includes(outsideDefault));
+  }
+
+  const runtimeConfig = trustedRuntimeConfig(config);
+  assert.equal(
+    Object.hasOwn(runtimeConfig.network, "allowedDomains"),
+    false,
+    "an absent network policy selects filesystem-only wrapping",
+  );
 });
 
 test("sensitive home paths cover credential stores", () => {

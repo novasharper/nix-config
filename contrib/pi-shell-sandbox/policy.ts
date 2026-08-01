@@ -161,6 +161,19 @@ function networkPolicy(): SandboxRuntimeConfig["network"] {
   };
 }
 
+function trustedNetworkPolicy(): SandboxRuntimeConfig["network"] {
+  return {
+    // Sandbox Runtime rejects an all-domain wildcard. Initialization uses an
+    // empty list so no proxy is started; trustedRuntimeConfig() removes the
+    // field afterward, which is the runtime's filesystem-only sentinel.
+    allowedDomains: [],
+    deniedDomains: [],
+    allowUnixSockets: [],
+    allowAllUnixSockets: true,
+    allowLocalBinding: true,
+  };
+}
+
 function filesystemPolicy(
   project: string,
   runtimeTemp: string,
@@ -193,6 +206,19 @@ function platformPolicy(): Partial<SandboxRuntimeConfig> {
   };
 }
 
+// Sandbox Runtime always seeds these writable compatibility directories. In
+// trusted mode they would be holes in the project-only write boundary unless
+// denyWrite explicitly revokes them. Device entries in the upstream default
+// remain writable so ordinary command I/O continues to work.
+function runtimeDefaultDiskWritePaths(): string[] {
+  return [
+    path.join(os.homedir(), ".npm/_logs"),
+    path.join(os.homedir(), ".claude/debug"),
+    "/tmp/claude",
+    "/private/tmp/claude",
+  ];
+}
+
 export function sandboxConfig(
   project: string,
   runtimeTemp: string,
@@ -214,6 +240,41 @@ export function sandboxConfig(
     mandatoryDenySearchDepth: 3,
     ...platformPolicy(),
   };
+}
+
+// Trust removes read, environment, and network restrictions, but keeps the
+// write allowlist at the OS boundary. Shell syntax is too expressive for a
+// lexical redirect check to prove where every program will write.
+export function trustedSandboxConfig(
+  project: string,
+  runtimeTemp: string,
+): SandboxRuntimeConfig {
+  return {
+    network: trustedNetworkPolicy(),
+    filesystem: {
+      denyRead: [],
+      allowWrite: [project, runtimeTemp],
+      denyWrite: runtimeDefaultDiskWritePaths(),
+      allowGitConfig: true,
+    },
+    enableWeakerNestedSandbox: false,
+    allowPty: false,
+    ripgrep: { command: "rg" },
+    mandatoryDenySearchDepth: 0,
+    ...platformPolicy(),
+  };
+}
+
+// Sandbox Runtime's public type requires allowedDomains, but its wrapper
+// intentionally distinguishes an absent field (no network restriction) from
+// an empty list (block all). updateConfig() accepts this filesystem-only shape
+// without validation; tests pin the absent field and generated macOS profile
+// so an upstream semantic change fails closed during the package build.
+export function trustedRuntimeConfig(
+  config: SandboxRuntimeConfig,
+): SandboxRuntimeConfig {
+  const { allowedDomains: _allowedDomains, ...network } = config.network;
+  return { ...config, network } as unknown as SandboxRuntimeConfig;
 }
 
 // Linux has no usable read-deny globs, so each command needs a fresh literal

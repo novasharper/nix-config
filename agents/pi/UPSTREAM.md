@@ -412,8 +412,9 @@ lists, so a new module is a one-line addition there.
 | --- | --- |
 | `index.ts` | Entry point. Registers the guards, approval-aware `bash` tool, session events, and `/sandbox`, then installs the bash delegate last. |
 | `sandbox.ts` | Sandboxed command wrapping, execution, environment sanitization, and diagnostics. |
-| `session.ts` | Serialized sandbox lifecycle, state transitions, project validation, and status. |
+| `session.ts` | Serialized sandbox lifecycle, state transitions, project validation, status, and the enforced/disabled mode. |
 | `session-resources.ts` | Session cache/temp creation, TMPDIR redirection and restoration, cleanup. |
+| `mode.ts` | Where a session's mode comes from: the `PI_SHELL_SANDBOX` setting and the remembered trusted-project store. |
 | `policy.ts` | `SandboxRuntimeConfig` construction, the network allowlist, the seccomp asset paths substituted by Nix. |
 | `project-scan.ts` | Enumerates in-project credential paths for `denyRead`/`denyWrite`. |
 | `environment.ts` | The child environment: credential removal and cache redirection. |
@@ -432,6 +433,54 @@ attaches a module-private approval symbol after Pi validates the JSON input;
 the tool consumes that symbol before selecting local host operations. Protected
 bash access requests the same approval automatically, while protected file-tool
 access is confirmed in the guard. Missing UI or missing approval fails closed.
+
+### 4.3 The mode and trusted projects
+
+`/sandbox [status|on|off|trust|untrust]` switches the sandbox at run time, and
+`agents.pi.shellSandbox.enable` sets the startup default through
+`PI_SHELL_SANDBOX`. Off means the project is trusted: credential reads, the
+provider environment, and network access are relaxed, while Sandbox Runtime
+retains a project-only write policy. Paths inside the trusted project stop being
+confirmed, and everything else — out-of-project credentials, destructive
+commands, environment dumps, and fully unconfined host execution — still is.
+
+Sandbox Runtime has no typed "filesystem only" configuration: its public type
+requires `network.allowedDomains`, but `wrapWithSandbox` deliberately treats an
+absent field as no network restriction and an empty list as block-all. Trusted
+mode initializes with an empty list (so no proxy starts), then passes a cloned
+configuration without that field through the public `updateConfig` method.
+Tests pin the absent field, `(allow network*)` in the generated macOS profile,
+and the real Linux generator's lack of `--unshare-net`, so upstream drift fails
+the build.
+
+Notes that are easy to re-derive wrongly:
+
+- ⚠️ `programs.pi.coding-agent.environment` emits
+  `export <NAME>=<escapeShellArg value>` (`options.nix:292`), so it cannot
+  express a default the caller can override. `PI_SHELL_SANDBOX` is exported by
+  `agents/pi/default.nix`'s own wrapper as `"${PI_SHELL_SANDBOX:-<default>}"`
+  instead, which keeps `PI_SHELL_SANDBOX=0 pi` working for one invocation.
+- `registerCommand(name, { description, handler })` passes the raw argument
+  remainder as a **string**, and command handlers get `ExtensionCommandContext`
+  — `ExtensionContext` plus `waitForIdle()`, which the toggle awaits before
+  tearing down a session's runtime temp directory.
+- `ctx.isProjectTrusted()` exists but answers a different question: it is pi's
+  trust decision for loading project-local configs (`.pi`, `.agents/skills`),
+  resolved from `trust.json` and `defaultProjectTrust`, and frequently never
+  prompted. The extension keeps its own trust state rather than reusing it.
+- The remembered store lives at
+  `${XDG_STATE_HOME:-~/.local/state}/pi-shell-sandbox/trusted-projects.json`
+  because `getDefaultWritePaths()` (§2.2) plus `allowWrite` does not cover
+  `~/.local/state`, so a sandboxed command cannot grant itself trust. The
+  exception is a project that *contains* the store — `allowWrite` includes the
+  whole project — so a remembered entry for such a project is never honored.
+  Both paths are resolved through symlinks and their deepest existing ancestors
+  before this comparison, including a symlinked `XDG_STATE_HOME`.
+- `session_start` also fires for resume and fork with a different `cwd`, so a
+  session-scope toggle is recorded with the project it was issued for, and the
+  in-project relaxation is measured against that project rather than `ctx.cwd`.
+
+### 4.4 Build and checks
 
 Because nothing is bundled, `default.nix` has almost no build step — the work is
 in the check phases:

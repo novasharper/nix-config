@@ -210,6 +210,104 @@ walk. It is not a hole: such paths reach `denyRead` through
 `fixedSecretRelativePaths` and through `**/credentials`. The
 test now pins that reasoning so the carve-out is not mistaken for a bug later.
 
+## What changes when the sandbox is turned off
+
+`/sandbox off`, `/sandbox trust`, `agents.pi.shellSandbox.enable = false`, and
+`PI_SHELL_SANDBOX=0` all reach the same state: the project is trusted, and
+commands run with the real provider environment, unrestricted reads, all
+network domains, Unix sockets, and local binding. The environment sanitizer,
+credential read policy, and network allowlist are gone in that state. A small
+kernel-enforced filesystem policy remains: writes are allowed only inside the
+trusted project and the private runtime temp directory. This boundary covers
+both model bash and `!` user bash; shell text cannot soundly predict every path
+an arbitrary child program may write. The child environment retains the real
+provider credentials and other caller values, but `TMPDIR` is set to that
+writable private runtime directory so Linux tools do not fall back to the
+policy-denied `/tmp`.
+
+What still holds:
+
+- Credential paths that resolve **outside** the trusted project are confirmed
+  for both bash and the file tools. Bash writes outside the project are denied
+  by the OS policy; the model can request an explicitly justified host
+  escalation, which is confirmed before bypassing that policy. File-tool writes
+  outside the project retain their direct confirmation.
+- Destructive commands and environment dumps are confirmed exactly as before,
+  including option-bearing `env` dumps and payloads passed through
+  path-qualified shells.
+- Attribution fails closed. `secretPathsEscapeProject` only skips a
+  confirmation when every credential-looking token in the command resolves
+  inside the trusted project. Every literal candidate is canonicalized before
+  classification, so an innocuous spelling that is a symlink to an external
+  credential remains guarded. Assignment values are attributed as paths, and
+  an unresolved expansion in a credential-bearing command is treated as
+  escaping. Also treated as escaping: a token carrying anything
+  the resolver does not itself interpret (`$HOME`, backticks, `~user`,
+  `\/abs`, partial quoting such as `"/Users"/x`, brace expansion, globs), any
+  construct that re-roots later relative paths (`cd`/`pushd`/`popd`, and the
+  flag forms `-C`/`--directory`/`--chdir`, attached spellings included), and a
+  whole-command match that no token accounts for. The cost of a wrong
+  "escapes" is one prompt; the cost of a wrong "contained" is a silent
+  credential read, so the rule lists what stays literal rather than trying to
+  enumerate what expands.
+- A path carried inside a flag token — `curl -d@PATH`, `ssh -iPATH`,
+  `rsync --files-from=PATH` — is split out and attributed like any other. This
+  is the one place where "unattributable" and "absent" had to be distinguished
+  carefully: dropping `-`-prefixed tokens outright did not make such a command
+  fail closed, because the whole-command fail-closed branch only fires when
+  *nothing* accounts for the match. One in-project token elsewhere in the
+  command — a decoy as cheap as a trailing `# .env` — then made the whole
+  command read as contained while the flag exfiltrated `~/.aws/credentials`.
+- The relaxation is measured against the project trust was granted for, not
+  `ctx.cwd`, which can move outside that tree during a session. A
+  session-scope toggle is likewise recorded per project, so `resume`/`fork`
+  into another project does not inherit it.
+
+Sandbox Runtime seeds several writable compatibility directories independently
+of `allowWrite`; trusted mode revokes the disk-backed defaults (`~/.npm/_logs`,
+`~/.claude/debug`, `/tmp/claude`, and `/private/tmp/claude`) so they cannot act
+as out-of-project write holes. The runtime's device entries remain writable for
+ordinary command I/O.
+
+The trust store remains outside the normal write allowlist. If a project
+contains its resolved location, `trustStoreIsWritableFromProject` refuses to
+remember or honor trust for it. Both the project and the store are resolved
+through symlinks and their deepest existing ancestors before comparison, so a
+symlinked `XDG_STATE_HOME` cannot disguise a store located inside the project.
+Trust for such a project is session-scoped only.
+
+One lexical rule was reworked for this, and it took three attempts, which is
+worth recording because each failure had the same shape: narrowing the left
+context to exclude `cat .env` kept excluding legitimate command positions too.
+`\b(?:env|export|set)\s*(?:$|[;&|>])` matched `cat .env`, reading a file whose
+name ends in `env` as an environment dump — invisible while every credential
+path was confirmed anyway, but a trusted project must be able to read its own
+`.env` without a prompt, and a dump, unlike a path, cannot be attributed to a
+directory. Anchoring on `^` then missed everything past index 0 (no `m` flag):
+`echo hi\nenv`, `if true; then env; fi`, `eval env`. Adding separators and
+keywords still missed `{ env; }`, `X=1 env`, `time env`, `! env`,
+`/usr/bin/env`, and quoted shell payloads such as `bash -c 'env'`. The rule is
+now built from named parts — separator, prefix
+(assignments and modifiers), verb, terminator — with the path spelling handled
+by its own pattern, and `environment dumps are recognized in command position
+only` pins every shape above alongside the `cat .env` negatives.
+
+A fourth pass added the backtick to the separator and terminator classes.
+Command substitution — `` `env` ``, ``echo `set` ``, ``x=`export` `` — puts the
+verb in command position exactly as `$(...)` and `(env)` do, but the classes
+only listed `(` and `$`, so the backtick spelling reached the real host
+environment in a trusted project without a prompt. The test pins the backtick
+forms next to the subshell ones.
+
+A fifth pass separated `env` from the bare `export`/`set` grammar. An `env`
+invocation still dumps provider credentials when it carries only options or
+`NAME=VALUE` assignments, so `env -0`, `env -u PATH`, and `/usr/bin/env -0`
+must be confirmed. The matcher now models the GNU/BSD option forms while
+requiring the argument list to end there; `env -u PATH /usr/bin/true` remains
+an ordinary command invocation. Shell command prefixes also accept absolute
+paths and combined `-c` flags, covering `/bin/bash -c env` and
+`/bin/bash -lc env` without reclassifying `cat .env` as a dump.
+
 ## Reproducing these measurements
 
 The scanner and policy-construction regressions are permanent unit tests. The
@@ -219,5 +317,7 @@ with `SandboxManager.wrapWithSandbox`, and execute the result. Passing an empty
 `allowedDomains` avoids starting proxies while retaining the filesystem policy.
 
 The Linux checks call the real `wrapCommandWithSandboxLinux` generator and
-inspect its Bubblewrap arguments. An equivalent execution on a Linux host is
-still outstanding.
+inspect its Bubblewrap arguments. The trusted execution regression also pins
+the child `TMPDIR` to the same runtime directory that the generated Bubblewrap
+policy marks writable while retaining provider credentials. An equivalent
+Bubblewrap execution on a Linux host is still outstanding.

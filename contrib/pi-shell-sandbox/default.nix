@@ -47,6 +47,7 @@ let
     "sandbox.ts"
     "session.ts"
     "session-resources.ts"
+    "mode.ts"
     "policy.ts"
     "project-scan.ts"
     "environment.ts"
@@ -64,6 +65,7 @@ let
     "index.test.ts"
     "sandbox.test.ts"
     "session.test.ts"
+    "mode.test.ts"
     "policy.test.ts"
     "project-scan.test.ts"
     "environment.test.ts"
@@ -231,6 +233,7 @@ stdenv.mkDerivation {
 
     mkdir -p "$out/extensions/shell-sandbox"
     install -m 0444 ${packageJson} "$out/package.json"
+    install -m 0444 ${./README.md} "$out/README.md"
     ${lib.concatMapStringsSep "\n" (
       name: ''install -D -m 0444 extension/${name} "$out/extensions/shell-sandbox/${name}"''
     ) extensionSources}
@@ -263,6 +266,8 @@ stdenv.mkDerivation {
     # leaving pi to start with no extension and therefore no shell guard.
     install -m 0644 ${./load-smoke-test.mjs} load-smoke-test.mjs
     bun load-smoke-test.mjs "$out"
+
+    test -r "$out/README.md"
 
     # Test-only sources must not ship.
     test ! -e "$out/extensions/shell-sandbox/${testDirectory}"

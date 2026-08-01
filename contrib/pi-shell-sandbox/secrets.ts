@@ -152,10 +152,57 @@ const destructiveCommands = [
   /\bnix-store\s+--delete\b/,
 ];
 
+// A dump verb counts only in command position. A bare \b would read `cat .env`
+// as an environment dump, which matters once a trusted project stops
+// confirming its own files: the path rules already classify .env, and unlike a
+// dump they can be attributed to a directory. Everything that can legally sit
+// between a separator and a command word therefore has to be spelled out here
+// — a narrower class silently loses `{ env; }`, `X=1 env`, and `time env`.
+// Backtick (\x60) is a separator and a terminator too: command substitution
+// (`env`, echo `set`, x=`export`) puts the verb in command position just as
+// $(...) does, so it must not be a way around the guard.
+const dumpSeparator = String.raw`(?:^|[\r\n;&|({!\x60])`;
+const dumpShellPrefix =
+  String.raw`(?:\/\S*\/)?[a-z]*sh(?:\s+--(?:noprofile|norc|posix|restricted|verbose|noediting))*\s+-[a-zA-Z]*c[a-zA-Z]*`;
+const dumpPrefix =
+  String.raw`(?:\s*(?:[A-Za-z_][A-Za-z0-9_]*=\S*|then|do|else|eval|command|exec|builtin|time|nohup|nice|stdbuf|sudo|${dumpShellPrefix})\s+)*`;
+const dumpQuote = String.raw`(?:\$?["'])?`;
+const dumpEnd = String.raw`(?:\s*["'])?(?:$|[\r\n;&|>)}\x60])`;
+
+// `env` prints the environment when its options and NAME=VALUE assignments
+// are not followed by a command. Keep the option grammar explicit so
+// `env -u PATH /usr/bin/true` remains an ordinary command invocation rather
+// than becoming a trusted-mode confirmation. GNU and BSD spellings used by
+// the platforms this extension supports are covered here.
+const envOptionValue =
+  String.raw`(?:[^\s"';&|>)}\x60]+|["'][^"'\r\n]*["'])`;
+const envAssignmentValue =
+  String.raw`(?:[^\s;&|>)}\x60]*|["'][^"'\r\n]*["'])`;
+const envNoArgumentOption =
+  String.raw`(?:-|--|-[i0v]+|--(?:ignore-environment|null|debug|list-signal-handling))`;
+const envRequiredArgumentOption =
+  String.raw`(?:(?:-[i0v]*(?:u|C|P|S)|--(?:unset|chdir|split-string))\s+${envOptionValue}|-[i0v]*(?:u|C|P|S)${envOptionValue}|--(?:unset|chdir|split-string)=${envOptionValue})`;
+const envSignalOption =
+  String.raw`--(?:block-signal|default-signal|ignore-signal)(?:=${envOptionValue})?`;
+const envAssignment =
+  String.raw`[A-Za-z_][A-Za-z0-9_]*=${envAssignmentValue}`;
+const envDumpArgument =
+  String.raw`(?:${envNoArgumentOption}|${envRequiredArgumentOption}|${envSignalOption}|${envAssignment})`;
+const envDumpVerb = String.raw`env(?:\s+${envDumpArgument})*`;
+const dumpVerb = String.raw`(?:${envDumpVerb}|export|set)`;
+
 // Commands that print an environment or read a credential store directly,
 // rather than naming a secret path.
 const credentialDumpCommands = [
-  /\b(?:env|export|set)\s*(?:$|[;&|>])/,
+  new RegExp(
+    `${dumpSeparator}${dumpPrefix}\\s*${dumpQuote}\\s*${dumpVerb}\\s*${dumpEnd}`,
+  ),
+  // `/usr/bin/env`. The separator form above cannot cover this without also
+  // matching a path ending in `.env`, so it is spelled separately: the verb
+  // has to follow a path separator directly.
+  new RegExp(
+    String.raw`(?:^|[\s;&|({!\x60])\/\S*\/${envDumpVerb}\s*${dumpEnd}`,
+  ),
   /\b(?:declare|typeset|export)\s+(?:-[a-zA-Z]+\s*)*(?:$|[;&|>])/,
   /\bprintenv\b/,
   /\bprocess\.env\b/,

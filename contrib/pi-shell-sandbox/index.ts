@@ -17,10 +17,14 @@ import {
   guardToolCall,
   installSandboxBashOperations,
 } from "./security.ts";
+import { forgetTrust, rememberTrust } from "./mode.ts";
 import {
   beginSession,
+  resolveProject,
   sandboxStatus,
+  setSandboxMode,
   shutdownSandbox,
+  type TrustScope,
 } from "./session.ts";
 
 let sessionCwd = process.cwd();
@@ -64,7 +68,7 @@ export function createApprovalBashToolDefinition(
 
   return {
     ...sandboxTool,
-    description: `${sandboxTool.description} Commands run in the shell sandbox by default. Set sandbox_permissions to require_escalated and provide a justification to request manual approval for host execution.`,
+    description: `${sandboxTool.description} Commands run in the shell sandbox unless the current project is trusted, in which case they run directly on the host; the /sandbox command reports which. While the sandbox is on, set sandbox_permissions to require_escalated and provide a justification to request manual approval for host execution.`,
     promptGuidelines: [
       ...(sandboxTool.promptGuidelines ?? []),
       "Use the bash tool with sandbox_permissions=require_escalated and a concise justification only when a necessary command is blocked by the shell sandbox; the user must approve host execution.",
@@ -120,15 +124,101 @@ function registerSessionLifecycle(pi: ExtensionAPI): void {
   });
 }
 
+const SANDBOX_USAGE = "Usage: /sandbox [status|on|off|trust|untrust]";
+
+function reportSandbox(ctx: any): void {
+  const status = sandboxStatus();
+  // A trusted project is a warning rather than an error: it is a state the
+  // user chose, unlike a sandbox that failed to start.
+  const level =
+    status.phase === "active"
+      ? "info"
+      : status.mode === "disabled" && status.phase === "disabled"
+        ? "warning"
+        : "error";
+  ctx.ui.notify(sandboxDiagnosticText(), level);
+}
+
+// Switching tears down the session's runtime temp directory, so let a command
+// that is already running finish inside the sandbox it was wrapped for.
+async function switchSandbox(
+  ctx: any,
+  next: "enforced" | "disabled",
+  scope: TrustScope,
+): Promise<void> {
+  await ctx.waitForIdle?.();
+  await setSandboxMode(next, String(ctx.cwd), ctx.ui, scope);
+  reportSandbox(ctx);
+}
+
+async function trustProject(ctx: any): Promise<void> {
+  const project = resolveProject(String(ctx.cwd));
+  if (!ctx.hasUI) {
+    ctx.ui.notify(
+      "Remembering a trusted project requires interactive mode.",
+      "error",
+    );
+    return;
+  }
+
+  const approved = await ctx.ui.confirm(
+    "Trust this project",
+    `Turn the shell sandbox off for ${project}, now and in future sessions?\n\n` +
+      "Commands will run on the host, and anything inside the project will be " +
+      "read and written without confirmation. /sandbox untrust undoes this.",
+  );
+  if (!approved) {
+    return;
+  }
+
+  if (!rememberTrust(project)) {
+    ctx.ui.notify(
+      `${project} contains the trust store, so a remembered decision for it ` +
+        "could be written by a sandboxed command. Use /sandbox off for this " +
+        "session instead.",
+      "error",
+    );
+    return;
+  }
+  await switchSandbox(ctx, "disabled", "remembered");
+}
+
+async function untrustProject(ctx: any): Promise<void> {
+  const project = resolveProject(String(ctx.cwd));
+  if (!forgetTrust(project)) {
+    ctx.ui.notify(`${project} was not a remembered trusted project.`, "info");
+  }
+  await switchSandbox(ctx, "enforced", "session");
+}
+
+export async function runSandboxCommand(args: string, ctx: any): Promise<void> {
+  switch (args.trim().toLowerCase()) {
+    case "":
+    case "status":
+      reportSandbox(ctx);
+      return;
+    case "on":
+      await switchSandbox(ctx, "enforced", "session");
+      return;
+    case "off":
+      await switchSandbox(ctx, "disabled", "session");
+      return;
+    case "trust":
+      await trustProject(ctx);
+      return;
+    case "untrust":
+      await untrustProject(ctx);
+      return;
+    default:
+      ctx.ui.notify(`Unknown /sandbox argument. ${SANDBOX_USAGE}`, "error");
+  }
+}
+
 function registerSandboxCommand(pi: ExtensionAPI): void {
   pi.registerCommand("sandbox", {
-    description: "Show shell sandbox status",
-    handler: async (_args, ctx) => {
-      ctx.ui.notify(
-        sandboxDiagnosticText(),
-        sandboxStatus().phase === "active" ? "info" : "error",
-      );
-    },
+    description:
+      "Show or change shell sandbox state: status, on, off, trust, untrust",
+    handler: runSandboxCommand,
   });
 }
 

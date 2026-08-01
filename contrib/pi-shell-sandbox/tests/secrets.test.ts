@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { accessesSecret, projectSecretPathGlobs } from "../secrets.ts";
+import {
+  accessesSecret,
+  exposesSecretValue,
+  projectSecretPathGlobs,
+} from "../secrets.ts";
 
 test("credential guard separates paths from prose", () => {
   for (const command of [
@@ -26,6 +30,101 @@ test("credential guard separates paths from prose", () => {
     "cat .dockerignore",
   ]) {
     assert.ok(!accessesSecret(command), `${command} should be allowed`);
+  }
+});
+
+test("environment dumps are recognized in command position only", () => {
+  for (const command of [
+    "env",
+    "  env  ",
+    "env | grep KEY",
+    "cd /tmp && env",
+    "export",
+    "printenv",
+    "gh auth token",
+    // A separator is a separator whatever its spelling. Anchoring on the start
+    // of the string alone let every one of these through, and a newline is how
+    // a model usually writes a second step.
+    "echo checking the build\nenv",
+    "ls\nenv > /tmp/dump",
+    "env\ncat report.txt",
+    "cat foo\nexport",
+    "set -e\nenv",
+    "if true; then env; fi",
+    "for i in 1; do env; done",
+    "eval env",
+    "command env",
+    "exec env",
+    "(env)",
+    // Command substitution puts the verb in command position the same way a
+    // subshell does, so a backtick must not be a way around the guard.
+    "`env`",
+    "echo `env`",
+    "`export`",
+    "`set`",
+    "x=`env`",
+    "echo `set` | sort",
+    "`/usr/bin/env`",
+    // A command word can also follow a brace, an inline assignment, a
+    // modifier, or a negation, and can be spelled as a path.
+    "{ env; }",
+    "X=1 env",
+    "LC_ALL=C env",
+    "time env",
+    "time env | head",
+    "! env",
+    "nohup env",
+    "env -0",
+    "env --null",
+    "env -u PATH",
+    "env --unset PATH",
+    "env --unset=PATH",
+    "env -iu PATH",
+    "env FOO=bar",
+    "/usr/bin/env",
+    "/usr/bin/env -0",
+    "bash -c env",
+    "/bin/bash -c env",
+    "/bin/bash -lc env",
+    "/bin/bash --noprofile -c env",
+    "bash -c 'env'",
+    'bash -c "env"',
+    "bash -c ' env '",
+    "bash -c $'env'",
+    "bash -c 'env | sort'",
+    "/usr/bin/bash -c 'env -u PATH'",
+    "/nix/store/example/bin/bash -c 'env -0'",
+    "sh -c export",
+  ]) {
+    assert.ok(exposesSecretValue(command), `${command} should be guarded`);
+  }
+
+  // These name a file whose path happens to end in "env". The path rules
+  // classify them, and unlike this one they can be attributed to a directory,
+  // which is what lets a trusted project read its own .env without a prompt.
+  for (const command of [
+    "cat .env",
+    "vim .env.local",
+    "cp .env .env.bak",
+    "docker run --env-file .env",
+    "echo done\ncat .env",
+    "if true; then cat .env; fi",
+    "source .env",
+    "bash -c 'cat .env'",
+    "cat /home/me/.env",
+  ]) {
+    assert.ok(!exposesSecretValue(command), `${command} is not a dump`);
+    assert.ok(accessesSecret(command), `${command} is still a secret path`);
+  }
+
+  // `env` with a command changes that command's environment; it does not
+  // print the environment itself and should not add a trusted-mode prompt.
+  for (const command of [
+    "env -u PATH /usr/bin/true",
+    "env -C /tmp pwd",
+  ]) {
+    assert.ok(!exposesSecretValue(command), `${command} is not a dump`);
+    assert.ok(!accessesSecret(command), `${command} is not a secret path`);
   }
 });
 

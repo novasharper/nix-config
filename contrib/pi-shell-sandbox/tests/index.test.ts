@@ -3,6 +3,7 @@ import test from "node:test";
 
 import shellSandboxExtension, {
   createApprovalBashToolDefinition,
+  runSandboxCommand,
 } from "../index.ts";
 import { guardToolCall, installSandboxBashOperations } from "../security.ts";
 import {
@@ -55,6 +56,35 @@ test("sandbox command reports manual host execution", async (context) => {
   assert.match(notification?.message ?? "", /Unix sockets: blocked/);
   assert.match(notification?.message ?? "", /Manual per-command host execution: enabled/);
   assert.equal(notification?.level, "error");
+});
+
+test("the sandbox command rejects unknown and non-interactive requests", async (context) => {
+  restoreSandboxBashOperationsAfter(context);
+  const notices: Array<[string, string]> = [];
+  const ctx = {
+    cwd: process.cwd(),
+    hasUI: false,
+    ui: {
+      notify(message: string, level: string) {
+        notices.push([message, level]);
+      },
+      async confirm() {
+        return true;
+      },
+    },
+  };
+
+  await runSandboxCommand("bogus", ctx);
+  assert.match(notices.at(-1)?.[0] ?? "", /Unknown \/sandbox argument/);
+  assert.equal(notices.at(-1)?.[1], "error");
+
+  // Remembering a decision that outlives the session needs a user to confirm.
+  await runSandboxCommand("trust", ctx);
+  assert.match(notices.at(-1)?.[0] ?? "", /requires interactive mode/);
+  assert.equal(notices.at(-1)?.[1], "error");
+
+  await runSandboxCommand("status", ctx);
+  assert.match(notices.at(-1)?.[0] ?? "", /^Shell sandbox: /m);
 });
 
 test("bash tool uses local operations only with consumed approval", async (context) => {
