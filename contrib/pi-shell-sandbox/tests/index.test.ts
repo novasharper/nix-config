@@ -29,6 +29,11 @@ test("entry point registers fail-closed behavior in order", (context) => {
   const bashTool = tools.get("bash");
   assert.ok(bashTool.parameters.properties.sandbox_permissions);
   assert.ok(bashTool.parameters.properties.justification);
+  assert.ok(
+    bashTool.promptGuidelines.some((guideline: string) =>
+      guideline.startsWith("Use the bash tool ")
+    ),
+  );
 });
 
 test("sandbox command reports manual host execution", async (context) => {

@@ -67,7 +67,7 @@ export function createApprovalBashToolDefinition(
     description: `${sandboxTool.description} Commands run in the shell sandbox by default. Set sandbox_permissions to require_escalated and provide a justification to request manual approval for host execution.`,
     promptGuidelines: [
       ...(sandboxTool.promptGuidelines ?? []),
-      "If a necessary command is blocked by the shell sandbox, retry it with sandbox_permissions=require_escalated and a concise justification. The user must approve host execution.",
+      "Use the bash tool with sandbox_permissions=require_escalated and a concise justification only when a necessary command is blocked by the shell sandbox; the user must approve host execution.",
     ],
     parameters: approvedBashSchema,
     async execute(
