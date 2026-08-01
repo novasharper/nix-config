@@ -21,7 +21,7 @@ in
 {
   programs.vscode = enable {
     profiles.default = {
-      extensions = with pkgs.nix-vscode-extensions.vscode-marketplace; [
+      extensions = with pkgs.nix-vscode-extensions.vscode-marketplace-release; [
         anthropic.claude-code
         bbenoist.nix
         catppuccin.catppuccin-vsc
