@@ -1,13 +1,13 @@
-{ bun
-, bun2nix
-, fetchFromGitHub
-, lib
-, pi-coding-agent-bun
-, piNix
-, stdenv
-, which
-, writeText
-,
+{
+  bun,
+  bun2nix,
+  fetchFromGitHub,
+  lib,
+  pi-coding-agent-bun,
+  piNix,
+  stdenv,
+  which,
+  writeText,
 }:
 
 let
@@ -81,22 +81,23 @@ let
   # install -D so a source under tests/ creates its parent.
   installSources =
     directory: names:
-    lib.concatMapStringsSep "\n"
-      (
-        name: "install -D -m 0644 ${./. + "/${name}"} ${directory}/${name}"
-      )
-      names;
+    lib.concatMapStringsSep "\n" (
+      name: "install -D -m 0644 ${./. + "/${name}"} ${directory}/${name}"
+    ) names;
   packageJson = writeText "pi-shell-sandbox-package.json" (
-    builtins.toJSON (sourcePackage // {
-      inherit version;
-      # pi loads extensions through jiti, which transpiles TypeScript and
-      # resolves the entry's own imports, so the sources ship as written: one
-      # declared entry point, its sibling modules beside it, and the runtime
-      # dependency resolved through the node_modules symlink below.
-      pi.extensions = [
-        "./extensions/shell-sandbox/index.ts"
-      ];
-    })
+    builtins.toJSON (
+      sourcePackage
+      // {
+        inherit version;
+        # pi loads extensions through jiti, which transpiles TypeScript and
+        # resolves the entry's own imports, so the sources ship as written: one
+        # declared entry point, its sibling modules beside it, and the runtime
+        # dependency resolved through the node_modules symlink below.
+        pi.extensions = [
+          "./extensions/shell-sandbox/index.ts"
+        ];
+      }
+    )
   );
   # Checks the extension against the real @earendil-works/pi-coding-agent and
   # @anthropic-ai/sandbox-runtime typings installed in node_modules. strict is
@@ -131,10 +132,9 @@ let
           --replace-fail '@seccompApplyPath@' ""
       '';
 in
-assert lib.assertMsg
-  (
-    !stdenv.isLinux || sandboxArch != null
-  ) "Pi shell sandbox supports Linux only on x86_64 and aarch64";
+assert lib.assertMsg (
+  !stdenv.isLinux || sandboxArch != null
+) "Pi shell sandbox supports Linux only on x86_64 and aarch64";
 
 stdenv.mkDerivation {
   pname = "pi-shell-sandbox";
@@ -151,11 +151,12 @@ stdenv.mkDerivation {
 
   bunDeps = bun2nix.fetchBunDeps {
     bunNix =
-      { copyPathToStore
-      , fetchFromGitHub
-      , fetchgit
-      , fetchurl
-      , ...
+      {
+        copyPathToStore,
+        fetchFromGitHub,
+        fetchgit,
+        fetchurl,
+        ...
       }@args:
       import piBunNix (args // { workspaceRoot = piSource; });
   };
