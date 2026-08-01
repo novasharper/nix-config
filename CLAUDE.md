@@ -32,7 +32,7 @@ nix flake update --flake ~/.config/home-manager
 
 **Format Nix files:**
 ```bash
-nixpkgs-fmt <file.nix>
+nix fmt   # nixfmt-tree (nixfmt-rfc-style), declared as the flake formatter
 ```
 
 **Check/evaluate config without switching:**

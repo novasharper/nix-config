@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:www.schemastore.org)"
+      "WebFetch(domain:www.schemastore.org)",
+      "Read(//nix/store/**)",
+      "Bash(nix log *)"
     ]
   }
 }

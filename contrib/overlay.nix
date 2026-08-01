@@ -1,3 +1,5 @@
+{ pi-nix, ... }:
+
 let
   disabled = {
     # pkg = {
@@ -10,6 +12,17 @@ in
 final: prev:
 {
   mkAgentWrapper = import ./agent-wrapper.nix { pkgs = final; };
+
+  # pi extension that confines every shell command to @anthropic-ai/sandbox-
+  # runtime. Defined as an overlay so the home-manager module and
+  # `nix flake check` build one derivation — and with it one run of the
+  # extension's type check and test suite.
+  #
+  # Needs bun2nix and pi-nix in `final`, so those overlays have to be applied
+  # before this one.
+  pi-shell-sandbox = final.callPackage ./pi-shell-sandbox {
+    piNix = pi-nix;
+  };
 
   vscode-local = {
     ms-vscode.cpptools = final.vscode-utils.buildVscodeMarketplaceExtension {

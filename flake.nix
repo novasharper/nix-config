@@ -16,8 +16,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    pi-nix = {
+      url = "github:lukasl-dev/pi.nix";
+      inputs.bun2nix.follows = "bun2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Nix Community
+    bun2nix = {
+      url = "github:nix-community/bun2nix?ref=2.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,6 +49,7 @@
     contrib = {
       url = ./contrib;
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.pi-nix.follows = "pi-nix";
     };
   };
 
@@ -53,7 +63,6 @@
     }@inputs:
     let
       inherit (self) outputs;
-
     in
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -67,12 +76,23 @@
             inputs.fenix.overlays.default
             inputs.nixgl.overlay
             inputs.nix-vscode-extensions.overlays.default
+            inputs.bun2nix.overlays.default
+            inputs.pi-nix.overlays.default
+            # Last: contrib's pi-shell-sandbox resolves bun2nix and
+            # pi-coding-agent-bun out of the overlays above.
             inputs.contrib.overlays.default
           ];
         };
       in
       {
         formatter = pkgs.nixfmt-tree;
+
+        checks = {
+          # Its checkPhase runs tsc against the real pi and sandbox-runtime
+          # typings, the test-shim conformance assertions, and the unit tests;
+          # its installCheckPhase loads the installed extension through jiti.
+          pi-shell-sandbox = pkgs.pi-shell-sandbox;
+        };
 
         legacyPackages = {
           homeConfigurations = {
@@ -81,6 +101,7 @@
               modules = [
                 inputs.contrib.homeModules.default
                 inputs.nixvim.homeModules.nixvim
+                inputs.pi-nix.homeModules.default
                 ./home.nix
               ];
               extraSpecialArgs = {
