@@ -22,7 +22,7 @@ in
 {
   config = lib.mkIf config.agents.enable {
     programs.goose-cli = {
-      enable = true;
+      enable = false;
 
       # GOOSE_PROVIDER and GOOSE_MODEL are deliberately left undeclared so that
       # `goose configure` and in-session model switches persist across

@@ -89,7 +89,7 @@ in
     ];
 
     programs.pi.coding-agent = {
-      enable = true;
+      enable = false;
       # Carries --append-system-prompt and --extension itself; see above.
       package = piPackageWithResources;
       environment = {
