@@ -122,10 +122,6 @@ Host-side guards run independently of the kernel sandbox. They cover:
 - file-tool writes outside the trusted project.
 
 Interactive use requests confirmation. Non-interactive access fails closed.
-See
-[SECURITY-REVIEW.md](https://github.com/novasharper/nix-config/blob/main/contrib/pi-shell-sandbox/SECURITY-REVIEW.md)
-for the full threat model, measured bypasses, residual risks, and
-platform-specific policy behavior.
 
 ## Building and testing
 
