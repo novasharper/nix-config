@@ -64,7 +64,7 @@ in
       };
       settings = {
         autoMemoryEnabled = true;
-        model = "sonnet";
+        model = "opus";
         includeCoAuthoredBy = false;
         attribution = {
           commit = "";
