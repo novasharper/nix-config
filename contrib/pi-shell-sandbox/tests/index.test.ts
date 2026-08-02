@@ -1,19 +1,26 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 import test from "node:test";
 
 import shellSandboxExtension, {
   createApprovalBashToolDefinition,
+  getSandboxArgumentCompletions,
   runSandboxCommand,
 } from "../index.ts";
 import { guardToolCall, installSandboxBashOperations } from "../security.ts";
+import { beginSession, shutdownSandbox } from "../session.ts";
 import {
   captureExtension,
   restoreSandboxBashOperationsAfter,
+  tempProject,
+  withEnvironmentOverrides,
+  withStubbedSandboxManager,
 } from "./test-support.ts";
 
 test("entry point registers fail-closed behavior in order", (context) => {
   restoreSandboxBashOperationsAfter(context);
-  const { registrations, tools } = captureExtension(shellSandboxExtension);
+  const { registrations, tools, commands } = captureExtension(shellSandboxExtension);
 
   assert.deepEqual(registrations.slice(0, 3), [
     "event:user_bash",
@@ -27,6 +34,9 @@ test("entry point registers fail-closed behavior in order", (context) => {
   assert.ok(registrations.includes("event:session_start"));
   assert.ok(registrations.includes("event:session_shutdown"));
   assert.ok(registrations.includes("command:sandbox"));
+  const sandboxCommand = commands.get("sandbox");
+  assert.ok(sandboxCommand);
+  assert.equal(typeof sandboxCommand.getArgumentCompletions, "function");
   const bashTool = tools.get("bash");
   assert.ok(bashTool.parameters.properties.sandbox_permissions);
   assert.ok(bashTool.parameters.properties.justification);
@@ -56,6 +66,113 @@ test("sandbox command reports manual host execution", async (context) => {
   assert.match(notification?.message ?? "", /Unix sockets: blocked/);
   assert.match(notification?.message ?? "", /Manual per-command host execution: enabled/);
   assert.equal(notification?.level, "error");
+});
+
+test("the sandbox command exposes argument completions for every subcommand", (context) => {
+  restoreSandboxBashOperationsAfter(context);
+  const { commands } = captureExtension(shellSandboxExtension);
+  const sandboxCommand = commands.get("sandbox");
+  assert.ok(sandboxCommand);
+  assert.equal(
+    sandboxCommand.getArgumentCompletions,
+    getSandboxArgumentCompletions,
+    "the registered completion must be the exported function",
+  );
+
+  const all = getSandboxArgumentCompletions("");
+  assert.deepEqual(
+    all.map((item) => item.value),
+    ["status", "on", "off", "trust", "untrust"],
+  );
+  for (const item of all) {
+    assert.equal(item.value, item.label);
+    assert.ok(
+      typeof item.description === "string" && item.description.length > 0,
+      `${item.value} should carry a description`,
+    );
+  }
+
+  assert.deepEqual(
+    getSandboxArgumentCompletions("o").map((item) => item.value),
+    ["on", "off"],
+  );
+  assert.deepEqual(
+    getSandboxArgumentCompletions("un").map((item) => item.value),
+    ["untrust"],
+  );
+  // Case-insensitive prefix matching.
+  assert.deepEqual(
+    getSandboxArgumentCompletions("ON").map((item) => item.value),
+    ["on"],
+  );
+  assert.deepEqual(
+    getSandboxArgumentCompletions("s").map((item) => item.value),
+    ["status"],
+  );
+  assert.deepEqual(
+    getSandboxArgumentCompletions("nope").map((item) => item.value),
+    [],
+  );
+});
+
+// Picking a completion inserts its value as the whole argument, so a value the
+// switch in runSandboxCommand does not handle would autocomplete into an
+// "Unknown /sandbox argument" error. Asserting the list against itself proves
+// nothing, so this drives each offered value through the real handler.
+test("every completion value is a subcommand the handler accepts", async (context) => {
+  restoreSandboxBashOperationsAfter(context);
+  const testRoot = tempProject(context, "pi-completion-handler-test-");
+  const project = path.join(testRoot, "project");
+  fs.mkdirSync(project);
+
+  const notices: Array<[string, string]> = [];
+  const ctx = {
+    cwd: project,
+    hasUI: true,
+    ui: {
+      notify(message: string, level: string) {
+        notices.push([message, level]);
+      },
+      setStatus() {},
+      async confirm() {
+        return true;
+      },
+    },
+  };
+  const unknownArgument = /Unknown \/sandbox argument/;
+
+  await withEnvironmentOverrides(
+    {
+      // Pin the mode and the trust store away from the developer's own.
+      PI_SHELL_SANDBOX: undefined,
+      XDG_STATE_HOME: path.join(testRoot, "state"),
+      XDG_CACHE_HOME: path.join(testRoot, "cache"),
+    },
+    () =>
+      withStubbedSandboxManager(async () => {
+        await beginSession(project, ctx.ui);
+        try {
+          // trust and untrust run last and in that order, so the temp trust
+          // store is left as it was found.
+          for (const { value } of getSandboxArgumentCompletions("")) {
+            notices.length = 0;
+            await runSandboxCommand(value, ctx);
+            assert.ok(
+              !notices.some(([message]) => unknownArgument.test(message)),
+              `/sandbox ${value} is offered as a completion but the handler rejects it`,
+            );
+          }
+        } finally {
+          await shutdownSandbox();
+        }
+      }),
+  );
+
+  // The loop above only means something if that message is still what an
+  // unhandled argument produces.
+  notices.length = 0;
+  await runSandboxCommand("bogus", ctx);
+  assert.match(notices.at(-1)?.[0] ?? "", unknownArgument);
 });
 
 test("the sandbox command rejects unknown and non-interactive requests", async (context) => {

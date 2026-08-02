@@ -124,6 +124,49 @@ function registerSessionLifecycle(pi: ExtensionAPI): void {
   });
 }
 
+// /sandbox completion: the canonical subcommand spelling, its display label,
+// and the one-line description surfaced in the completion popup. Kept here so
+// the status strings cannot drift between the completion, the runSandboxCommand
+// switch, and the README command table.
+type AutocompleteItem = { value: string; label: string; description?: string };
+
+const SANDBOX_SUBCOMMANDS: readonly AutocompleteItem[] = [
+  {
+    value: "status",
+    label: "status",
+    description: "Show the current project, backend, mode, and restrictions",
+  },
+  {
+    value: "on",
+    label: "on",
+    description: "Enable the full sandbox for this project and session",
+  },
+  {
+    value: "off",
+    label: "off",
+    description: "Trust this project for the current session",
+  },
+  {
+    value: "trust",
+    label: "trust",
+    description: "Confirm and remember trust for this project across sessions",
+  },
+  {
+    value: "untrust",
+    label: "untrust",
+    description: "Forget remembered trust and enable the full sandbox",
+  },
+];
+
+export function getSandboxArgumentCompletions(
+  argumentPrefix: string,
+): AutocompleteItem[] {
+  const needle = argumentPrefix.toLowerCase();
+  return SANDBOX_SUBCOMMANDS.filter(
+    (item) => item.value.toLowerCase().startsWith(needle),
+  );
+}
+
 const SANDBOX_USAGE = "Usage: /sandbox [status|on|off|trust|untrust]";
 
 function reportSandbox(ctx: any): void {
@@ -218,6 +261,7 @@ function registerSandboxCommand(pi: ExtensionAPI): void {
   pi.registerCommand("sandbox", {
     description:
       "Show or change shell sandbox state: status, on, off, trust, untrust",
+    getArgumentCompletions: getSandboxArgumentCompletions,
     handler: runSandboxCommand,
   });
 }
