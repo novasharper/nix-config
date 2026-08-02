@@ -9,6 +9,7 @@
     ./claude.nix
     ./codex.nix
     ./goose.nix
+    ./opencode.nix
     ./pi
   ];
 
