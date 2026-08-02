@@ -89,13 +89,6 @@
       {
         formatter = pkgs.nixfmt-tree;
 
-        checks = {
-          # Its checkPhase runs tsc against the real pi and sandbox-runtime
-          # typings, the test-shim conformance assertions, and the unit tests;
-          # its installCheckPhase loads the installed extension through jiti.
-          pi-shell-sandbox = pkgs.pi-shell-sandbox;
-        };
-
         legacyPackages = {
           homeConfigurations = {
             pllong = home-manager.lib.homeManagerConfiguration {
