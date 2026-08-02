@@ -72,6 +72,12 @@
     },
     "contrib": {
       "inputs": {
+        "bun2nix": [
+          "bun2nix"
+        ],
+        "flake-utils": [
+          "flake-utils"
+        ],
         "nixpkgs": [
           "nixpkgs"
         ],

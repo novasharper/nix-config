@@ -50,6 +50,8 @@
       url = ./contrib;
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.pi-nix.follows = "pi-nix";
+      inputs.bun2nix.follows = "bun2nix";
+      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
