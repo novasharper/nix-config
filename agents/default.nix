@@ -16,7 +16,7 @@
   options = {
     agents.enable = lib.mkOption {
       type = lib.types.bool;
-      default = pkgs.stdenv.isDarwin;
+      default = pkgs.stdenv.hostPlatform.isDarwin;
       example = true;
       description = "Whether to enable coding agents.";
     };

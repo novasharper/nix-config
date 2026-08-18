@@ -10,6 +10,10 @@ let
 
 in
 final: prev:
+let
+  inherit (prev.stdenv) hostPlatform;
+
+in
 {
   mkAgentWrapper = import ./agent-wrapper.nix { pkgs = final; };
 
@@ -60,7 +64,7 @@ final: prev:
 }
 // (builtins.mapAttrs (
   name: value:
-  if (value.skipDarwin && prev.stdenv.isDarwin || value.skipLinux && prev.stdenv.isLinux) then
+  if (value.skipDarwin && hostPlatform.isDarwin || value.skipLinux && hostPlatform.isLinux) then
     prev.${name}.overrideAttrs (old: {
       doCheck = false;
     })

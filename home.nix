@@ -7,10 +7,10 @@
 }:
 
 let
-  stdenv = pkgs.stdenv;
+  inherit (pkgs.stdenv) hostPlatform;
   enable = x: x // { enable = true; };
   username = "pllong";
-  homedir = if stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
+  homedir = if hostPlatform.isDarwin then "/Users/${username}" else "/home/${username}";
   confdir = "${homedir}/.config";
   localConf = "${confdir}/nix-local/default.nix";
 
@@ -33,8 +33,8 @@ in
     ./editors
   ]
   ++ lib.optional (builtins.pathExists localConf) localConf
-  ++ lib.optional stdenv.isLinux ./linux.nix
-  ++ lib.optional stdenv.isDarwin ./darwin.nix;
+  ++ lib.optional hostPlatform.isLinux ./linux.nix
+  ++ lib.optional hostPlatform.isDarwin ./darwin.nix;
 
   home = {
     username = username;
@@ -133,8 +133,8 @@ in
         executable = true;
         text =
           let
-            chPfx = if stdenv.isDarwin then "nixpkgs" else "nixos";
-            chSfx = if (stdenv.isDarwin && nixVersion != "unstable") then "-darwin" else "";
+            chPfx = if hostPlatform.isDarwin then "nixpkgs" else "nixos";
+            chSfx = if (hostPlatform.isDarwin && nixVersion != "unstable") then "-darwin" else "";
             nixCh = "${chPfx}-${nixVersion}${chSfx}";
 
           in
@@ -242,7 +242,7 @@ in
     };
 
     ghostty = enable {
-      package = if stdenv.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
+      package = if hostPlatform.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
       settings = {
         auto-update = "off";
         background-opacity = 0.95;

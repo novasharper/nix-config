@@ -121,7 +121,7 @@ let
   # --replace-fail: a placeholder that moves or disappears is a build failure
   # rather than a silently empty asset path.
   substituteSeccompPaths =
-    if stdenv.isLinux then
+    if stdenv.hostPlatform.isLinux then
       ''
         substituteInPlace extension/${seccompSource} \
           --replace-fail '@seccompBpfPath@' "$out/${seccompDirectory}/unix-block.bpf" \
@@ -135,7 +135,7 @@ let
       '';
 in
 assert lib.assertMsg (
-  !stdenv.isLinux || sandboxArch != null
+  !stdenv.hostPlatform.isLinux || sandboxArch != null
 ) "Pi shell sandbox supports Linux only on x86_64 and aarch64";
 
 stdenv.mkDerivation {
@@ -149,7 +149,7 @@ stdenv.mkDerivation {
     bun
     bun2nix.hook
   ]
-  ++ lib.optionals stdenv.isDarwin [ which ];
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ which ];
 
   bunDeps = bun2nix.fetchBunDeps {
     bunNix =
@@ -243,7 +243,7 @@ stdenv.mkDerivation {
     # the extension and pi share one instance of the runtime.
     ln -s ${pi-coding-agent-bun}/lib/node_modules "$out/node_modules"
   ''
-  + lib.optionalString stdenv.isLinux ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
     mkdir -p "$out/${seccompDirectory}"
     install -m 0444 \
       "node_modules/@anthropic-ai/sandbox-runtime/${seccompDirectory}/unix-block.bpf" \

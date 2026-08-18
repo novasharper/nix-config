@@ -48,7 +48,7 @@ let
     pkgs.ripgrep
     pkgs.which
   ]
-  ++ lib.optionals pkgs.stdenv.isLinux [
+  ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
     pkgs.bubblewrap
     pkgs.socat
   ];
