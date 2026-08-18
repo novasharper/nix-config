@@ -177,7 +177,7 @@ in
     ];
     # EDITOR is set to nvim by programs.neovim.defaultEditor in editors/nvim.nix.
     sessionVariables = { };
-    stateVersion = "25.11";
+    stateVersion = "26.11";
   };
 
   news.display = "silent";
