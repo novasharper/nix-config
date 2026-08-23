@@ -65,6 +65,7 @@ in
       settings = {
         autoMemoryEnabled = true;
         model = "opus";
+        theme = "auto";
         includeCoAuthoredBy = false;
         attribution = {
           commit = "";

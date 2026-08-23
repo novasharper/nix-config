@@ -33,7 +33,7 @@ Keep changes in the narrowest relevant module. Put shared settings in `home.nix`
 
 ## Coding Style & Naming Conventions
 
-Use two-space indentation in Nix files and run `nixpkgs-fmt <file.nix>` before submitting changes. Prefer small, composable modules and existing repository patterns. Use `enable = x: x // { enable = true; };` when enabling Home Manager programs, and pass `nixVersion` through `extraSpecialArgs` for channel construction. VSCodium is configured through `pkgs.vscodium`; preserve its immutable extensions setup.
+Use two-space indentation in Nix files and run `nix fmt` before submitting changes. Prefer small, composable modules and existing repository patterns. Use `enable = x: x // { enable = true; };` when enabling Home Manager programs, and pass `nixVersion` through `extraSpecialArgs` for channel construction. VSCodium is configured through `pkgs.vscodium`; preserve its immutable extensions setup.
 
 Name new modules descriptively with lowercase, hyphenated filenames where needed. Shell scripts should use clear command names and fail safely.
 
