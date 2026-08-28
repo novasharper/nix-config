@@ -10,6 +10,7 @@ let
     pkg = pkgs.claude-code;
     name = "claude";
     env = {
+      CLAUDE_CODE_DISABLE_1M_CONTEXT = 1;
       CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS = 1;
       CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = 1;
       CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1;
@@ -74,6 +75,9 @@ in
         statusLine = {
           type = "command";
           command = ../contrib/claude-session-info.py;
+        };
+        enabledPlugins = {
+          "gopls-lsp@claude-plugins-official" = true;
         };
         # Sandbox/Permissions
         permissions = {
