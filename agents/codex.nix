@@ -22,15 +22,6 @@
         ];
       };
       settings = {
-        model_providers.ai-internal = {
-          name = "ai-internal";
-          base_url = "https://ai.internal.nvsh.net/api/v1";
-          env_key = "LLM_AUTH_KEY";
-          request_max_retries = 4;
-          stream_max_retries = 5;
-          stream_idle_timeout_ms = 60000;
-        };
-
         # Sandbox
         approval_policy = "on-request";
         sandbox_mode = "workspace-write";
@@ -43,17 +34,26 @@
       };
       profiles = {
         internal = {
+          model_providers.ai-internal = {
+            name = "ai-internal";
+            # TODO
+            base_url = "http://ai.internal.nvsh.net:8080/v1";
+            request_max_retries = 4;
+            stream_max_retries = 5;
+            stream_idle_timeout_ms = 60000;
+          };
+
           # Codex special-cases 'gpt-5.x' names for some features; other
           # model ids are passed through to the provider verbatim.
-          model = "qwen3-coder-next";
-          model_context_window = 131072;
+          model = "unsloth/Laguna-S-2.1";
+          model_context_window = 128 * 1024;
           model_provider = "ai-internal";
 
           # qwen3-coder-next doesn't honor OpenAI's web_search tool schema.
           web_search = "disabled";
 
           # No reasoning output expected from this model.
-          hide_agent_reasoning = true;
+          hide_agent_reasoning = false;
         };
       };
     };
