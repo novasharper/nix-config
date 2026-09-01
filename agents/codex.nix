@@ -5,8 +5,44 @@
   ...
 }:
 
+let
+  xdgConfigHome = lib.removePrefix config.home.homeDirectory config.xdg.configHome;
+  configDir = if config.home.preferXdgDirectories then "${xdgConfigHome}/codex" else ".codex";
+  configPath = "${configDir}/config.toml";
+  nixConfig = config.home.file.${configPath}.source;
+
+in
 {
   config = lib.mkIf config.agents.enable {
+    home = {
+      activation = lib.mkIf config.programs.codex.enable {
+        mergeCodexConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+          configPath="$HOME"/${lib.escapeShellArg configPath}
+          nixConfig=${lib.escapeShellArg nixConfig}
+
+          run mkdir -p "$(dirname "$configPath")"
+          if [[ -e "$configPath" ]]; then
+            mergedConfig="$(mktemp)"
+            ${lib.getExe pkgs.yq-go} \
+              eval-all \
+              --input-format=toml \
+              --output-format=toml \
+              '(select(fileIndex == 0) // {}) * select(fileIndex == 1)' \
+              "$configPath" \
+              "$nixConfig" \
+              > "$mergedConfig"
+            run install -D -m 644 "$mergedConfig" "$configPath"
+          else
+            run install -D -m 644 "$nixConfig" "$configPath"
+          fi
+        '';
+      };
+
+      file = {
+        "${configPath}".enable = false;
+      };
+    };
+
     programs.codex = {
       enable = true;
       package = pkgs.mkAgentWrapper {
@@ -16,10 +52,6 @@
         #   file = "~/.llm-auth-key";
         #   var = "LLM_AUTH_KEY";
         # };
-        extraArgs = [
-          "--profile"
-          "local"
-        ];
       };
       settings = {
         # Sandbox
