@@ -22,6 +22,9 @@ let
     ps.virtualenv
     ps.numpy
     ps.scipy
+    #ps.torch
+    #ps.torchaudio
+    #ps.torchvision
   ]);
 
 in
@@ -90,6 +93,7 @@ in
       kubernetes-helm
       lima-full
       mosh
+      openscad
       osv-scanner
       qpdf
       ripgrep
