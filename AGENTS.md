@@ -6,17 +6,8 @@ This repository is a Home Manager flake for user `pllong`. It manages shell tool
 
 - Root modules are the primary entry points: `flake.nix`, `home.nix`, `darwin.nix`, `linux.nix`, and `shells.nix`.
 - `editors/` contains Vim, Neovim, VSCodium, and Zed configuration.
-- `agents/` contains Claude, Codex, Goose, and pi modules. Before changing
-  `agents/pi/` or `contrib/pi-shell-sandbox/`, read `agents/pi/UPSTREAM.md` — it
-  records the pi extension and bash-tool APIs, sandbox-runtime policy semantics,
-  and pi.nix module options, so those don't have to be re-derived from the Nix
-  store.
+- `agents/` contains config for agentic coding harnesses.
 - `contrib/` provides custom derivations, overlays, and helper programs,
-  including the pi shell-sandbox extension (`contrib/pi-shell-sandbox/`). The
-  sandbox is on by default; `agents.pi.shellSandbox.enable`, the
-  `PI_SHELL_SANDBOX` environment variable, and `/sandbox [on|off|trust|untrust]`
-  turn it off, which marks the current project trusted. Changing what the
-  guards allow means updating `SECURITY-REVIEW.md` alongside the code.
 - `scripts/` contains installation and bootstrap scripts.
 - `home-manager/` and `nixpkgs/` support configuration paths under `~/.config`.
 

@@ -14,17 +14,8 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    pi-nix = {
-      url = "github:lukasl-dev/pi.nix";
-      inputs.bun2nix.follows = "bun2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     # Nix Community
-    bun2nix = {
-      url = "github:nix-community/bun2nix?ref=2.1.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -47,8 +38,6 @@
     contrib = {
       url = ./contrib;
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.pi-nix.follows = "pi-nix";
-      inputs.bun2nix.follows = "bun2nix";
       inputs.flake-utils.follows = "flake-utils";
     };
   };
@@ -76,10 +65,6 @@
             inputs.fenix.overlays.default
             inputs.nixgl.overlay
             inputs.nix-vscode-extensions.overlays.default
-            inputs.bun2nix.overlays.default
-            inputs.pi-nix.overlays.default
-            # Last: contrib's pi-shell-sandbox resolves bun2nix and
-            # pi-coding-agent-bun out of the overlays above.
             inputs.contrib.overlays.default
           ];
         };
@@ -94,7 +79,6 @@
               modules = [
                 inputs.contrib.homeModules.default
                 inputs.nixvim.homeModules.nixvim
-                inputs.pi-nix.homeModules.default
                 ./home.nix
               ];
               extraSpecialArgs = {

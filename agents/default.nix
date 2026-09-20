@@ -10,7 +10,6 @@
     ./codex.nix
     ./goose.nix
     ./opencode.nix
-    ./pi
   ];
 
   options = {
