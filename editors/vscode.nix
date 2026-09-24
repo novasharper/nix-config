@@ -17,6 +17,16 @@ let
         { "${key}" = value; }
     ) attrs;
 
+  # Run mesonlsp from the project's flake dev shell (the extension spawns the
+  # LSP with the workspace root as cwd). shellHook output is sent to stderr so
+  # it can't corrupt the LSP's stdio stream.
+  mesonlspFlake = pkgs.writeShellScript "mesonlsp-flake" ''
+    if dev_env=$(nix print-dev-env 2>/dev/null); then
+      eval "$dev_env" >&2
+    fi
+    exec mesonlsp "$@"
+  '';
+
 in
 {
   programs.vscode = enable {
@@ -95,6 +105,10 @@ in
           git.blame = {
             editorDecoration.enabled = true;
             statusBarItem.enabled = true;
+          };
+          mesonbuild = {
+            downloadLanguageServer = false;
+            languageServerPath = "${mesonlspFlake}";
           };
           window = {
             autoDetectColorScheme = true;
