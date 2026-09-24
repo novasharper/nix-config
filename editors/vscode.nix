@@ -28,12 +28,14 @@ in
         catppuccin.catppuccin-vsc-icons
         golang.go
         lencerf.beancount
+        mesonbuild.mesonbuild
         misodee.vscode-nbt
         ms-python.debugpy
         ms-python.python
         ms-python.vscode-pylance
         ms-python.vscode-python-envs
         ms-vscode.cpp-devtools
+        ms-vscode.cpptools
         ms-vscode.cpptools-themes
         ms-vscode-remote.remote-containers
         ms-vscode-remote.remote-ssh
@@ -53,7 +55,7 @@ in
         mcu-debug.rtos-views
         mcu-debug.peripheral-viewer
         # Local
-        pkgs.vscode-local.ms-vscode.cpptools
+        # pkgs.vscode-local.ms-vscode.cpptools
       ];
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
