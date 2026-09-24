@@ -69,10 +69,13 @@ in
           claudeCode = {
             preferredLocation = "sidebar";
             environmentVariables = [
-              "ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6"
-              "ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6"
               "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1"
+              "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1"
               "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1"
+              "CLAUDE_CODE_ENABLE_TELEMETRY=0"
+              "DISABLE_TELEMETRY=1"
+              "DISABLE_ERROR_REPORTING=1"
+              "DISABLE_FEEDBACK_COMMAND=1"
             ];
           };
           containers = {
