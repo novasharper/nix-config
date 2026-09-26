@@ -54,15 +54,6 @@ in
     programs.claude-code = {
       enable = true;
       package = pkgs.mkAgentWrapper baseAgentDef;
-      commands = {
-        session-info = ''
-          ---
-          description: Show Claude Code session info for the current project
-          allowed-tools: Bash
-          ---
-          Run `${../contrib/claude-session-info.py}` and output the result verbatim to the user. Do not summarize, truncate, reformat, or omit any part of the output.
-        '';
-      };
       settings = {
         autoMemoryEnabled = true;
         model = "opus";
