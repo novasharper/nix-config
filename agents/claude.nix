@@ -56,6 +56,8 @@ in
       package = pkgs.mkAgentWrapper baseAgentDef;
       settings = {
         autoMemoryEnabled = true;
+        # Autocompact when context size reaches 500k
+        autoCompactWindow = 500000;
         model = "opus";
         theme = "auto";
         includeCoAuthoredBy = false;
