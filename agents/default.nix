@@ -6,6 +6,7 @@
 
 {
   imports = [
+    ./antigravity.nix
     ./claude.nix
     ./codex.nix
     ./goose.nix

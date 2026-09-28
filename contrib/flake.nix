@@ -12,7 +12,7 @@
       ...
     }:
     {
-      overlays.default = import ./overlay.nix {};
+      overlays.default = import ./overlay.nix { };
 
       # Home Manager modules for programs with no upstream module.
       homeModules = {
