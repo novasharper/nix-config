@@ -40,6 +40,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    novasharper-claude-plugins = {
+      url = "git+ssh://git@github.com/novasharper/claude-plugins";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -65,6 +69,7 @@
             inputs.fenix.overlays.default
             inputs.nixgl.overlay
             inputs.nix-vscode-extensions.overlays.default
+            inputs.novasharper-claude-plugins.overlays.default
             inputs.contrib.overlays.default
           ];
         };

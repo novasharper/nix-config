@@ -52,12 +52,16 @@ in
     programs.claude-code = {
       enable = true;
       package = pkgs.mkAgentWrapper baseAgentDef;
+      marketplaces = {
+        novasharper = pkgs.novasharper-claude-plugins;
+      };
       settings = {
         autoMemoryEnabled = true;
         # Autocompact when context size reaches 500k
         autoCompactWindow = 500000;
         model = "opus";
         theme = "auto";
+        tui = "fullscreen";
         includeCoAuthoredBy = false;
         attribution = {
           commit = "";
@@ -69,6 +73,7 @@ in
         };
         enabledPlugins = {
           "gopls-lsp@claude-plugins-official" = true;
+          "agent-loop@novasharper" = true;
         };
         # Sandbox/Permissions
         permissions = {

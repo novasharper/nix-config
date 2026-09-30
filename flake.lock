@@ -270,6 +270,26 @@
         "type": "github"
       }
     },
+    "novasharper-claude-plugins": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790771939,
+        "narHash": "sha256-qo8pW9ySiqIFtDcNHLjD+3rRL9g3csM+odlbL7StPr4=",
+        "ref": "refs/heads/main",
+        "rev": "5e6c50e5dac06f64686433a43c94c89ffdb98346",
+        "revCount": 3,
+        "type": "git",
+        "url": "ssh://git@github.com/novasharper/claude-plugins"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/novasharper/claude-plugins"
+      }
+    },
     "root": {
       "inputs": {
         "claude-code": "claude-code",
@@ -281,7 +301,8 @@
         "nix-vscode-extensions": "nix-vscode-extensions",
         "nixgl": "nixgl",
         "nixpkgs": "nixpkgs",
-        "nixvim": "nixvim"
+        "nixvim": "nixvim",
+        "novasharper-claude-plugins": "novasharper-claude-plugins"
       }
     },
     "rust-analyzer-src": {
