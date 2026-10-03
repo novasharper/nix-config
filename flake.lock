@@ -274,11 +274,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790886606,
-        "narHash": "sha256-Pl42PVw2BBaaywd5vGulucXyHT7Pu2gF1CTpzagqBo0=",
+        "lastModified": 1791028510,
+        "narHash": "sha256-jfpAO3NDyrLYWY6YomTwd6F5VgxZFYrddbXy1W95knM=",
         "ref": "refs/heads/main",
-        "rev": "efda69c7fe16483536e8e33d61965495a33cfd46",
-        "revCount": 8,
+        "rev": "9aeb5539d2da9457f9675aa545fe2e405ae742c6",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://git@github.com/novasharper/claude-plugins"
       },

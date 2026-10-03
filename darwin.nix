@@ -18,6 +18,8 @@ in
       libreoffice-bin
       ncdu
       wget
+      # LLM
+      ollama
     ];
     shellAliases = {
       dequarantine = "xattr -d com.apple.quarantine";
