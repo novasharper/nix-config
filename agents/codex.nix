@@ -60,6 +60,25 @@ in
         allow_login_shell = false;
         sandbox_workspace_write.network_access = true;
 
+        tui = {
+          theme = "catppuccin-latte";
+          status_line = [
+            "model-with-reasoning"
+            "current-dir"
+            "run-state"
+            "permissions"
+            "approval-mode"
+            "context-remaining"
+            "five-hour-limit"
+            "weekly-limit"
+            "used-tokens"
+            "total-input-tokens"
+            "total-output-tokens"
+          ];
+          status_line_use_colors = true;
+          screen_reader_detection_done = true;
+        };
+
         # Analytics
         analytics.enabled = false;
         feedback.enabled = false;
