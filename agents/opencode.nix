@@ -7,7 +7,7 @@
 {
   config = lib.mkIf config.agents.enable {
     programs.opencode = {
-      enable = true;
+      enable = false;
       settings = {
         enabled_providers = [ "openrouter" ];
 

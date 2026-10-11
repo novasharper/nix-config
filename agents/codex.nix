@@ -44,7 +44,7 @@ in
     };
 
     programs.codex = {
-      enable = true;
+      enable = false;
       package = pkgs.mkAgentWrapper {
         pkg = pkgs.codex;
         name = "codex";
