@@ -44,6 +44,7 @@ in
         ms-python.python
         ms-python.vscode-pylance
         ms-python.vscode-python-envs
+        ms-vscode.cmake-tools
         ms-vscode.cpp-devtools
         ms-vscode.cpptools
         ms-vscode.cpptools-themes
@@ -55,6 +56,11 @@ in
         rust-lang.rust-analyzer
         samuelcolvin.jinjahtml
         tamasfe.even-better-toml
+        # Qt
+        theqtcompany.qt-core
+        theqtcompany.qt-qml
+        theqtcompany.qt-cpp
+        theqtcompany.qt-python
         # Raspberry Pi Pico
         # Disabling until supports system toolchain
         raspberry-pi.raspberry-pi-pico
@@ -137,6 +143,9 @@ in
               path = "/bin/zsh";
               args = [ "-l" ];
             };
+          };
+          "workbench.editorAssociations" = {
+            "*.qrc" = "qt-core.qrcEditor";
           };
         };
     };
