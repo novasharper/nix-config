@@ -73,6 +73,7 @@ in
         };
         enabledPlugins = {
           "gopls-lsp@claude-plugins-official" = true;
+          "clangd-lsp@claude-plugins-official" = true;
           "agent-loop@novasharper" = true;
         };
         # Sandbox/Permissions
