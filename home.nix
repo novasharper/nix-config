@@ -64,6 +64,10 @@ in
       nixpkgs-fmt
       nil
       nixd
+      # --- qt ---
+      qt6.qtbase
+      qt6.qtdeclarative
+      qt6.qttools
       # --- rust-lang ---
       # cargo
       # cargo-binutils

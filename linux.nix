@@ -65,6 +65,9 @@ in
     # cemu
     # obs-studio
     # (nixgl.wrap vlc)
+
+    # --- qt ---
+    qt6.qtwayland
   ];
 
   programs = {
