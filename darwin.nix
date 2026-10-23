@@ -11,10 +11,9 @@ in
 {
   home = {
     packages = with pkgs; [
-      ffmpeg
+      ffmpeg-full
       gnupg
-      # TODO: Broken
-      #keepassxc
+      keepassxc
       libreoffice-bin
       ncdu
       wget
