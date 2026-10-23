@@ -10,6 +10,8 @@
     {
       enable = true;
       defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
 
       extraPackages = with pkgs; [
         fd

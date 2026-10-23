@@ -2,7 +2,7 @@
 
 {
   programs.vim = {
-    enable = true;
+    enable = false;
     plugins = with pkgs.vimPlugins; [
       ale
       lightline-ale
