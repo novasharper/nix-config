@@ -16,15 +16,17 @@ let
 
   # package wrappers
   pythonEnv = pkgs.python314.withPackages (ps: [
+    ps.pyinstaller
     ps.pylint
     ps.setuptools
     ps.tox
     ps.virtualenv
+    ps.matplotlib
     ps.numpy
     ps.scipy
-    #ps.torch
-    #ps.torchaudio
-    #ps.torchvision
+    ps.torch
+    ps.torchaudio
+    ps.torchvision
   ]);
 
 in
