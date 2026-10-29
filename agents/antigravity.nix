@@ -12,6 +12,7 @@ in
   config = lib.mkIf config.agents.enable {
     programs.antigravity-cli = {
       enable = true;
+      mutableSettings = true;
 
       settings = {
         # Terminal Sandbox

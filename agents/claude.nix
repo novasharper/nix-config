@@ -51,6 +51,7 @@ in
 
     programs.claude-code = {
       enable = true;
+      mutableSettings = true;
       package = pkgs.mkAgentWrapper baseAgentDef;
       marketplaces = {
         novasharper = pkgs.novasharper-claude-plugins;
