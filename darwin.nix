@@ -13,7 +13,6 @@ in
     packages = with pkgs; [
       ffmpeg-full
       gnupg
-      keepassxc
       libreoffice-bin
       ncdu
       wget
